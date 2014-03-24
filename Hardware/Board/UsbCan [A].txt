@@ -1,0 +1,25 @@
+UsbCan
+======
+
+N   Part name                        RefDes   DigiKey              Alternatives
+--------------------------------------------------------------------------------
+2x  C 27pF /16V NP0 (0805)           C1 C2    1276-1285-1-ND
+1x  C 4.7nF /16V X7R (0805)          C3       399-1155-1-ND
+1x  C 10nF /16V NP0 (0805)           C4       1276-2984-1-ND
+4x  C 100nF /16V X7R (0805)          C5-C8    399-1170-1-ND
+2x  C 4.7uF /16V X5R (0805)          C9 C10   1276-1065-1-ND
+1x  C 10uF /16V X5R (0805)           C11      1276-1096-1-ND
+1x  DS LED Reverse                   DS1      475-2507-1-ND
+1x  J MCV 1,5/ 4-G-3,81              J1       277-1223-ND          ED2821-ND
+1x  JP DIP switch 2w                 JP1      CT2102MS-ND
+1x  L Ferrite 40Ohm (0805)           L1       445-2201-1-ND
+1x  P USB A, plug, horizontal        P1       WM17118-ND
+1x  Q P-MOSFET /10V                  Q1       DMP3098LDICT-ND
+7x  R 120 0.125W (0805)              R1-R7    RHM120AECT-ND
+1x  R 1K 0.125W (0805)               R8       RMCF0805FT1K00CT-ND
+1x  R 10K 0.125W (0805)              R9       RMCF0805JT10K0CT-ND
+1x  U FT232RL (SSOP-28)              U1       768-1007-1-ND
+1x  U PIC18F25K80 (SSOP-28)          U2       PIC18F25K80-I/SS-ND
+1x  U MCP2561 (SOIC-8)               U3       MCP2561-E/SN-ND      568-10289-1-ND
+1x  Y Crystal 16MHz /10ppm /18pF     Y1       887-1244-ND
+1x  P MC 1,5/ 4-ST-3,81                       277-1163-ND          ED2877-ND
