@@ -59,7 +59,7 @@ void init(void) {
 
     //wait for PLL lock
     PLLEN = 1;
-    Delay10KTCYx(6);
+    Delay10KTCYx(255);
 
     //clear all outputs
     LATA = 0b00000000;
@@ -69,7 +69,7 @@ void init(void) {
 
 
 void wait_short(void) {
-    Delay10KTCYx(64);
+    Delay10KTCYx(192);
 }
 
 

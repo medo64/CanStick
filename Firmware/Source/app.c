@@ -1,14 +1,17 @@
 #include <p18cxxx.h>
 #include <stdbool.h>
 
+
 #include "config.h"
 #include "io.h"
 #include "uart.h"
+#include "can.h"
 
 
 #define BUFFER_MAX   64
 unsigned char Buffer[BUFFER_MAX];
 unsigned char BufferCount = 0;
+
 bool Echo = false;
 
 void processUart(void);
@@ -17,12 +20,24 @@ void processUart(void);
 void main(void) {    
     init();
     io_init();
+
+    for (unsigned char i = 0; i < 3; i++) {
+        io_led_active();
+        wait_short();
+        io_led_inactive();
+        wait_short();
+    }
+
     uart_init(115200);
+    can_init_125k();
 
-    
+    io_turn_termination_on();
+
     while (true) {
+        ClrWdt();
 
-        processUart();
+        //processUart();
+        can_write();
 
         //uart_writeByte(uart_readByte());
     }
