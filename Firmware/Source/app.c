@@ -17,6 +17,16 @@ bool Echo = false;
 void processUart(void);
 
 
+void writeNumberAsHex(unsigned char number) {
+    unsigned char data[2];
+    data[0] = 0x30 + (number >> 4);
+    data[1] = 0x30 + (number & 0xF);
+    if (data[0] > 0x39) { data[0] += 7; }
+    if (data[1] > 0x39) { data[1] += 7; }
+    uart_writeBytes(data, 2);
+}
+
+
 void main(void) {    
     init();
     io_init();
@@ -33,12 +43,60 @@ void main(void) {
 
     io_turn_termination_on();
 
+    RXB0CONbits.RXM1 = 1; //receive all messages
+    
     while (true) {
         ClrWdt();
 
-        //processUart();
-        can_write();
+        processUart();
+        //can_write();
 
+        if (RXB0CONbits.RXFUL) {
+            io_led_toggle();
+
+            CAN_MESSAGE message;
+
+            if (RXB0SIDLbits.EXID) { //extended
+                message.Header.ID = ((uint32_t)RXB0SIDHbits.SID << 21) | ((uint32_t)RXB0SIDLbits.SID << 18) | ((uint32_t)RXB0SIDLbits.EID << 16) | ((uint32_t)RXB0EIDHbits.EID << 8) | ((uint32_t)RXB0EIDLbits.EID);
+                message.Flags.IsExtended = true;
+            } else {
+                message.Header.ID = (RXB0SIDHbits.SID << 3) | RXB0SIDLbits.SID;
+                message.Flags.IsExtended = false;
+            }
+            if (!RXB0CONbits.RTRRO) {
+                message.Flags.RemoteRequest = false;
+                message.Flags.Length = RXB0DLCbits.DLC;
+                unsigned char* data = (unsigned char*)&RXB0D0;
+                for (unsigned char i = 0; i < message.Flags.Length; i++) {
+                    message.Data[i] = *(data + i);
+                }
+            } else {
+                message.Flags.RemoteRequest = true;
+                message.Flags.Length = 0;
+            }
+
+            if (message.Flags.IsExtended) {
+                writeNumberAsHex(message.Header.ID3);
+                writeNumberAsHex(message.Header.ID2);
+                writeNumberAsHex(message.Header.ID1);
+                writeNumberAsHex(message.Header.ID0);
+            } else {
+                writeNumberAsHex(message.Header.ID1);
+                writeNumberAsHex(message.Header.ID0);
+            }
+            if (!message.Flags.RemoteRequest) {
+                uart_writeByte(':');
+                for (unsigned char i = 0; i < message.Flags.Length; i++) {
+                    writeNumberAsHex(message.Data[i]);
+                }
+            } else {
+                uart_writeByte('!');
+            }
+            uart_writeByte('\n');
+
+            RXB0CONbits.RXFUL = 0;
+            wait_short();
+        }
         //uart_writeByte(uart_readByte());
     }
 }
