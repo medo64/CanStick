@@ -3,7 +3,7 @@ UsbCan                                                     64 x 17 mm ~ 1.69sqin
 
 ##  Part name                        RefDes   DigiKey              Alternatives
 --------------------------------------------------------------------------------
- 2  C 27pF /16V NP0 (0805)           C1 C2    1276-1285-1-ND
+ 2  C 22pF /16V NP0 (0805)           C1 C2    1276-1047-1-ND
  1  C 10nF /16V NP0 (0805)           C3       1276-2984-1-ND
  4  C 100nF /16V X7R (0805)          C4-C7    399-1170-1-ND
  1  C 4.7uF /16V X5R (0805)          C8       1276-1065-1-ND
@@ -18,8 +18,8 @@ UsbCan                                                     64 x 17 mm ~ 1.69sqin
  2  R 10K 0.125W (0805)              R11 R12  RMCF0805JT10K0CT-ND
  1  U FT232RL (SSOP-28)              U1       768-1007-1-ND
  1  U PIC18F25K80 (SSOP-28)          U2       PIC18F25K80-I/SS-ND
- 1  U MCP2561 (SOIC-8)               U3       MCP2561-E/SN-ND      568-10289-1-ND
- 1  Y Crystal 16MHz /10ppm /18pF     Y1       887-1244-ND
+ 1  U MCP2561 (SOIC-8)               U3       MCP2561-E/SN-ND      568-10289-1-ND  MCP2562-E/SN-ND
+ 1  Y Crystal 12MHz /50ppm /20pF     Y1       887-2011-ND          887-1238-ND
  1  P MC 1,5/ 4-ST-3,81                       277-1163-ND          ED2877-ND
 
     1/2" heat-shrink tubing, 60mm
