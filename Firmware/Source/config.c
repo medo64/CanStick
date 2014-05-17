@@ -59,6 +59,7 @@ void init(void) {
 
     //wait for PLL lock
     PLLEN = 1;
+    while(!OSCCONbits.OSTS);
     Delay10KTCYx(255);
 
     //clear all outputs

@@ -26,6 +26,12 @@ void writeNumberAsHex(unsigned char number) {
     uart_writeBytes(data, 2);
 }
 
+void writeDigitAsHex(unsigned char number) {
+    unsigned char data = 0x30 + (number & 0xF);
+    if (data > 0x39) { data += 7; }
+    uart_writeByte(data);
+}
+
 
 void main(void) {    
     init();
@@ -42,38 +48,15 @@ void main(void) {
     can_init_125k();
 
     io_turn_termination_on();
-
-    RXB0CONbits.RXM1 = 1; //receive all messages
     
     while (true) {
         ClrWdt();
 
         processUart();
-        //can_write();
 
-        if (RXB0CONbits.RXFUL) {
-            io_led_toggle();
-
-            CAN_MESSAGE message;
-
-            if (RXB0SIDLbits.EXID) { //extended
-                message.Header.ID = ((uint32_t)RXB0SIDHbits.SID << 21) | ((uint32_t)RXB0SIDLbits.SID << 18) | ((uint32_t)RXB0SIDLbits.EID << 16) | ((uint32_t)RXB0EIDHbits.EID << 8) | ((uint32_t)RXB0EIDLbits.EID);
-                message.Flags.IsExtended = true;
-            } else {
-                message.Header.ID = (RXB0SIDHbits.SID << 3) | RXB0SIDLbits.SID;
-                message.Flags.IsExtended = false;
-            }
-            if (!RXB0CONbits.RTRRO) {
-                message.Flags.RemoteRequest = false;
-                message.Flags.Length = RXB0DLCbits.DLC;
-                unsigned char* data = (unsigned char*)&RXB0D0;
-                for (unsigned char i = 0; i < message.Flags.Length; i++) {
-                    message.Data[i] = *(data + i);
-                }
-            } else {
-                message.Flags.RemoteRequest = true;
-                message.Flags.Length = 0;
-            }
+        CAN_MESSAGE message;
+        if (can_read(&message)) {
+            io_led_active();
 
             if (message.Flags.IsExtended) {
                 writeNumberAsHex(message.Header.ID3);
@@ -81,7 +64,7 @@ void main(void) {
                 writeNumberAsHex(message.Header.ID1);
                 writeNumberAsHex(message.Header.ID0);
             } else {
-                writeNumberAsHex(message.Header.ID1);
+                writeDigitAsHex(message.Header.ID1);
                 writeNumberAsHex(message.Header.ID0);
             }
             if (!message.Flags.RemoteRequest) {
@@ -90,14 +73,11 @@ void main(void) {
                     writeNumberAsHex(message.Data[i]);
                 }
             } else {
-                uart_writeByte('!');
             }
             uart_writeByte('\n');
 
-            RXB0CONbits.RXFUL = 0;
-            wait_short();
+            io_led_inactive();
         }
-        //uart_writeByte(uart_readByte());
     }
 }
 

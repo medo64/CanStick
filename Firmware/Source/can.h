@@ -31,7 +31,7 @@ typedef  struct {
 
 
 void can_init_125k();
+bool can_read(CAN_MESSAGE* message);
 void can_write();
 
 #endif
-
