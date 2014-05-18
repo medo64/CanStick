@@ -78,7 +78,7 @@ void can_read(CAN_MESSAGE* message);
 bool can_readAsync(CAN_MESSAGE* message);
 
 /** Blocking write of CAN message.  */
-void can_write(CAN_MESSAGE message);
+bool can_write(CAN_MESSAGE message);
 
 /** Tries to write CAN message. Returns true if successful. */
 bool can_writeAsync(CAN_MESSAGE message);

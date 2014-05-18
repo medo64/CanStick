@@ -235,6 +235,9 @@ bool can_writeAsync(CAN_MESSAGE message) {
     return true;
 }
 
-void can_write(CAN_MESSAGE message) {
-    while (!can_writeAsync(message));
+bool can_write(CAN_MESSAGE message) {
+    while (!can_writeAsync(message)) {
+        if (COMSTATbits.TXBO || COMSTATbits.TXBP) { return false; } //break away if device is bus passive
+    }
+    return true;
 }

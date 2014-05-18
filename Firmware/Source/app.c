@@ -195,7 +195,9 @@ void processUart() {
                             if (tentativeSend) {
                                 can_writeAsync(message);
                             } else {
-                                can_write(message);
+                                if (!can_write(message)) {
+                                    uart_writeString("!t");
+                                }
                             }
                         } else {
                             uart_writeString("!l");
@@ -281,6 +283,37 @@ void processUart() {
                             }
                         } else {
                             uart_writeUInt16(can_getSpeed());
+                        }
+                    } break;
+
+                    case 's': { //CAN status
+                        if (UartBufferCount == 1) {
+                            CAN_STATUS status = can_getStatus();
+                            if (status.RxOverflow) {
+                                uart_writeByte('O');
+                            } else if (status.RxOverflowWarning) {
+                                uart_writeByte('o');
+                            }
+                            if (status.RxPassive) {
+                                uart_writeByte('R');
+                            } else if (status.RxWarning) {
+                                uart_writeByte('r');
+                            }
+                            if (status.TxOff) {
+                                uart_writeByte('X');
+                            } else if (status.TxPassive) {
+                                uart_writeByte('T');
+                            } else if (status.TxWarning) {
+                                uart_writeByte('t');
+                            }
+                        } else if (UartBufferCount == 2) {
+                            switch (UartBuffer[1]) {
+                                case 'r': uart_writeUInt8(RXERRCNT); break;
+                                case 't': uart_writeUInt8(TXERRCNT); break;
+                                default: uart_writeString("!k"); break;
+                            }
+                        } else {
+                            uart_writeString("!n");
                         }
                     } break;
 
