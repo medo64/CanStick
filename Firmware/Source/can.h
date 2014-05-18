@@ -30,16 +30,40 @@ typedef  struct {
 } CAN_MESSAGE;
 
 
+/** Initializes CAN module at 20 kbps. */
 void can_init_20k(void);
+
+/** Initializes CAN module at 50 kbps. */
 void can_init_50k(void);
+
+/** Initializes CAN module at 125 kbps. */
 void can_init_125k(void);
+
+/** Initializes CAN module at 250 kbps. */
 void can_init_250k(void);
+
+/** Initializes CAN module at 500 kbps. */
 void can_init_500k(void);
+
+/** Initializes CAN module at 800 kbps. */
 void can_init_800k(void);
+
+/** Initializes CAN module at 1000 kbps. */
 void can_init_1000k(void);
+
+/** Returns speed of CAN module. */
 uint16_t can_getSpeed();
 
-bool can_read(CAN_MESSAGE* message);
-void can_write();
+/** Blocking read of CAN message.  */
+void can_read(CAN_MESSAGE* message);
+
+/** Tries to read CAN message. Returns true if successful. */
+bool can_readAsync(CAN_MESSAGE* message);
+
+/** Blocking write of CAN message.  */
+void can_write(CAN_MESSAGE message);
+
+/** Tries to write CAN message. Returns true if successful. */
+bool can_writeAsync(CAN_MESSAGE message);
 
 #endif

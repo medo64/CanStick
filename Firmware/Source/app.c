@@ -38,7 +38,7 @@ void main(void) {
         processUart();
 
         CAN_MESSAGE message;
-        if (can_read(&message)) {
+        if (can_readAsync(&message)) {
             io_led_active();
 
             if (message.Flags.IsExtended) {
@@ -55,7 +55,6 @@ void main(void) {
                 for (uint8_t i = 0; i < message.Flags.Length; i++) {
                     uart_writeHexUInt8(message.Data[i]);
                 }
-            } else {
             }
             uart_writeByte('\n');
 
@@ -68,24 +67,148 @@ void main(void) {
 void processUart() {
     ClrWdt();
     while (uart_canRead()) {
-        io_led_active();
         uint8_t data = uart_readByte();
 
         if (Echo) { uart_writeByte(data); }
 
         if (((data == '\r') || (data == '\n')) && (BufferCount > 0)) {
+            io_led_active();
 
             switch (Buffer[0]) {
 
-                case '?': { //Status
+                case '?': {
                     if (BufferCount == 1) {
-                        uart_writeByte('?');
+                        uart_writeString("CanStick A");
+                    } else {
+                        uart_writeString("!n");
+                    }
+                } break;
+
+                case '#': { //Reset
+                    if (BufferCount == 1) {
+                        uart_writeByte('\n');
+                        Reset();
+                    } else {
+                        uart_writeString("!n");
+                    }
+                } break;
+
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                case 'A':
+                case 'B':
+                case 'C':
+                case 'D':
+                case 'E':
+                case 'F':
+                case 'a':
+                case 'b':
+                case 'c':
+                case 'd':
+                case 'e':
+                case 'f': {
+                    CAN_MESSAGE message;
+                    message.Header.ID = 0;
+                    message.Flags.RemoteRequest = 1;
+
+                    bool tentativeSend = false;
+                    bool hasError = false;
+
+                    uint8_t i = 0;
+
+                    //get id
+                    for (; (i <= 8) && (i < BufferCount); i++) { //8 id bytes max + 1 byte extra
+                        uint8_t value = Buffer[i];
+                        if (value == ':') { //data follows
+                            message.Flags.RemoteRequest = 0;
+                            i++;
+                            break;
+                        } else if (value == '~') { //send only if there is a free slot
+                            tentativeSend = true;
+                            i++;
+                            break;
+                        } else if ((value >= 0x30) && (value <= 0x39)) { //decimal hex value
+                            value -= 0x30;
+                        } else if ((value >= 0x41) && (value <= 0x46)) { //uppercase hex value
+                            value -= 0x37;
+                        } else if ((value >= 0x61) && (value <= 0x66)) { //lowercase hex value
+                            value -= 0x57;
+                        } else {
+                            hasError = true;
+                            uart_writeString("!i");
+                            break;
+                        }
+                        message.Header.ID <<= 4;
+                        message.Header.ID |= value;
+                    }
+                    if (hasError) { break; }
+
+                    if (message.Header.ID > 0x1FFFFFFF) {
+                        uart_writeString("!io");
+                        break;
+                    }
+                    message.Flags.IsExtended = (i > 4) || (message.Header.ID >= 0x7FF);
+
+                    if (!message.Flags.RemoteRequest) { //read data
+                        uint8_t j = 0;
+                        for (; (j <= 16) && (i < BufferCount); i++, j++) { //16 data bytes max + 1 byte extra
+                            uint8_t value = Buffer[i];
+                            if (value == '~') { //send only if there is a free slot
+                                tentativeSend = true;
+                                i++;
+                                break;
+                            } else if ((value >= 0x30) && (value <= 0x39)) { //decimal hex value
+                                value -= 0x30;
+                            } else if ((value >= 0x41) && (value <= 0x46)) { //uppercase hex value
+                                value -= 0x37;
+                            } else if ((value >= 0x61) && (value <= 0x66)) { //lowercase hex value
+                                value -= 0x57;
+                            } else {
+                                hasError = true;
+                                uart_writeString("!d");
+                                break;
+                            }
+                            uint8_t b = j / 2;
+                            message.Data[b] <<= 4;
+                            message.Data[b] |= value;
+                        }
+                        if (hasError) { break; }
+
+                        if (j % 2 == 0) {
+                            message.Flags.Length = j / 2;
+                        } else {
+                            uart_writeString("!dl");
+                            break;
+                        }
+                    }
+
+                    if (i == BufferCount) { //read whole buffer, send message
+                        if (tentativeSend) {
+                            can_writeAsync(message);
+                        } else {
+                            can_write(message);
+                        }
+                    } else {
+                        uart_writeString("!l");
+                    }
+                } break;
+
+                case 'i': { //Status
+                    if (BufferCount == 1) {
+                        uart_writeByte('i');
                         if (io_out_getPower()) { uart_writeByte('W'); } else { uart_writeByte('w'); }
                         if (io_out_getTermination()) { uart_writeByte('P'); } else { uart_writeByte('p'); }
                         if (Echo) { uart_writeByte('O'); } else { uart_writeByte('o'); }
                     } else {
-                        uart_writeByte('!');
-                        uart_writeByte('n');
+                        uart_writeString("!n");
                     }
                 } break;
 
@@ -93,8 +216,7 @@ void processUart() {
                     if (BufferCount == 1) {
                         Echo = true;
                     } else {
-                        uart_writeByte('!');
-                        uart_writeByte('n');
+                        uart_writeString("!n");
                     }
                 } break;
 
@@ -102,8 +224,7 @@ void processUart() {
                     if (BufferCount == 1) {
                         Echo = false;
                     } else {
-                        uart_writeByte('!');
-                        uart_writeByte('n');
+                        uart_writeString("!n");
                     }
                 } break;
 
@@ -111,8 +232,7 @@ void processUart() {
                     if (BufferCount == 1) {
                         io_out_terminationOn();
                     } else {
-                        uart_writeByte('!');
-                        uart_writeByte('n');
+                        uart_writeString("!n");
                     }
                 } break;
 
@@ -120,8 +240,7 @@ void processUart() {
                     if (BufferCount == 1) {
                         io_out_terminationOff();
                     } else {
-                        uart_writeByte('!');
-                        uart_writeByte('n');
+                        uart_writeString("!n");
                     }
                 } break;
 
@@ -149,7 +268,7 @@ void processUart() {
                             case 500: can_init_500k(); break;
                             case 800: can_init_800k(); break;
                             case 1000: can_init_1000k(); break;
-                            default: uart_writeByte('!'); uart_writeByte('v'); break;
+                            default: uart_writeString("!v"); break;
                         }
                     } else {
                         uart_writeByte('S');
@@ -161,8 +280,7 @@ void processUart() {
                     if (BufferCount == 1) {
                         io_out_powerOn();
                     } else {
-                        uart_writeByte('!');
-                        uart_writeByte('n');
+                        uart_writeString("!n");
                     }
                 } break;
 
@@ -170,20 +288,19 @@ void processUart() {
                     if (BufferCount == 1) {
                         io_out_powerOff();
                     } else {
-                        uart_writeByte('!');
-                        uart_writeByte('n');
+                        uart_writeString("!n");
                     }
                 } break;
 
                 default:
-                    uart_writeByte('!');
-                    uart_writeByte('c');
+                    uart_writeString("!c");
                     break;
 
             }
 
             uart_writeByte('\n');
             BufferCount = 0;
+            io_led_inactive();
 
         } else {
             if (BufferCount < BUFFER_MAX) {
@@ -193,7 +310,5 @@ void processUart() {
                 BufferCount = 255; //overflow
             }
         }
-
-        io_led_inactive();
     }
 }

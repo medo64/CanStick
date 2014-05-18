@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <GenericTypeDefs.h>
+
+#include "uart.h"
 #include "config.h"
 
 
@@ -59,6 +61,16 @@ void uart_writeBytes(uint8_t *value, uint8_t count) {
     }
 }
 
+void uart_writeString(const uint8_t* text) {
+    for (uint8_t i = 0; i < 255; i++) { //allow max 255 characters
+        if (text[i] == '\0') {
+            break;
+        } else {
+            uart_writeByte(text[i]);
+        }
+    }
+}
+
 
 void uart_writeUInt8(uint8_t number) {
     uint8_t chars[3] = { 0 };
@@ -87,14 +99,14 @@ void uart_writeUInt16(uint16_t number) {
 }
 
 
-void uart_writeHexDigit(uint8_t number) {
-    uint8_t data = 0x30 + (number & 0x0F);
+void uart_writeHexDigit(uint8_t value) {
+    uint8_t data = 0x30 + (value & 0x0F);
     if (data > 0x39) { data += 7; }
     uart_writeByte(data);
 }
 
-void uart_writeHexUInt8(uint8_t number) {
-    uart_writeHexDigit(number >> 4);
-    uart_writeHexDigit(number);
+void uart_writeHexUInt8(uint8_t value) {
+    uart_writeHexDigit(value >> 4);
+    uart_writeHexDigit(value);
 }
 

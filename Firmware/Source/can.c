@@ -152,7 +152,8 @@ uint16_t can_getSpeed() {
     return speed;
 }
 
-bool can_read(CAN_MESSAGE* message) {
+
+bool can_readAsync(CAN_MESSAGE* message) {
     CAN_RX* root = RxRegisters[CANCON & 0x0F];
 
     if ((*root).CON.RXFUL) {
@@ -180,17 +181,43 @@ bool can_read(CAN_MESSAGE* message) {
     }
 }
 
+void can_read(CAN_MESSAGE* message) {
+    while(!can_readAsync(message));
+}
 
-void can_write(void) {
-    while (TXB0CONbits.TXREQ);
 
-    io_led_toggle();
+bool can_writeAsync(CAN_MESSAGE message) {
+    if (TXB0CONbits.TXREQ) { return false; }
 
-    TXB0SIDL = 0x60;
-    TXB0SIDH = 0x00;
-    TXB0D0 = 65;
-    TXB0DLCbits.DLC = 1;
+    if (message.Flags.IsExtended) {
+        TXB0EIDLbits.EID = message.Header.ID & 0xFF;
+        TXB0EIDHbits.EID = (message.Header.ID >> 8) & 0xFF;
+        TXB0SIDLbits.EID = (message.Header.ID >> 16) & 0x03;
+        TXB0SIDLbits.SID = (message.Header.ID >> 18) & 0x07;
+        TXB0SIDHbits.SID = (message.Header.ID >> 21);
+    } else {
+        TXB0SIDLbits.SID = message.Header.ID & 0x07;
+        TXB0SIDHbits.SID = message.Header.ID >> 3;
+    }
+
+    TXB0SIDLbits.EXIDE = message.Flags.IsExtended;
+    TXB0DLCbits.DLC = message.Flags.Length;
+    TXB0DLCbits.TXRTR = message.Flags.RemoteRequest;
+
+    TXB0D0 = message.Data[0];
+    TXB0D1 = message.Data[1];
+    TXB0D2 = message.Data[2];
+    TXB0D3 = message.Data[3];
+    TXB0D4 = message.Data[4];
+    TXB0D5 = message.Data[5];
+    TXB0D6 = message.Data[6];
+    TXB0D7 = message.Data[7];
+
     TXB0CONbits.TXREQ = 1;
 
-    io_led_toggle();
+    return true;
+}
+
+void can_write(CAN_MESSAGE message) {
+    while(!can_writeAsync(message));
 }
