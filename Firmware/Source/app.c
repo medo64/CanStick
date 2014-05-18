@@ -204,7 +204,6 @@ void processUart() {
 
                     case 'i': { //Status
                         if (UartBufferCount == 1) {
-                            uart_writeByte('i');
                             if (io_out_getPower()) { uart_writeByte('W'); } else { uart_writeByte('w'); }
                             if (io_out_getTermination()) { uart_writeByte('P'); } else { uart_writeByte('p'); }
                             if (Report) { uart_writeByte('T'); } else { uart_writeByte('t'); }
@@ -256,7 +255,7 @@ void processUart() {
 
                     case 'S': { //Speed
                         if ((UartBufferCount == 2) && (UartBuffer[1] == '*')) { //auto-baud
-                            //
+                            //TODO
                         } else if (UartBufferCount > 1) {
                             uint16_t number = 0;
                             uint8_t digit;
@@ -281,7 +280,6 @@ void processUart() {
                                 default: uart_writeString("!v"); break;
                             }
                         } else {
-                            uart_writeByte('S');
                             uart_writeUInt16(can_getSpeed());
                         }
                     } break;
