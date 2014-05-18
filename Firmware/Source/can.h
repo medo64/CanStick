@@ -30,6 +30,18 @@ typedef  struct {
 } CAN_MESSAGE;
 
 
+typedef struct {
+    unsigned RxOrTxWarning     : 1;
+    unsigned RxWarning         : 1;
+    unsigned TxWarning         : 1;
+    unsigned RxPassive         : 1;
+    unsigned TxPassive         : 1;
+    unsigned TxOff             : 1;
+    unsigned RxOverflow        : 1;
+    unsigned RxOverflowWarning : 1;
+} CAN_STATUS;
+
+
 /** Initializes CAN module at 20 kbps. */
 void can_init_20k(void);
 
@@ -53,6 +65,11 @@ void can_init_1000k(void);
 
 /** Returns speed of CAN module. */
 uint16_t can_getSpeed();
+
+
+/** Returns CAN status. */
+CAN_STATUS can_getStatus(void);
+
 
 /** Blocking read of CAN message.  */
 void can_read(CAN_MESSAGE* message);

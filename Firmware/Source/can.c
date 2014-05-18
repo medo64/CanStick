@@ -45,6 +45,16 @@ typedef struct {
 } CAN_RX;
 
 
+typedef union {
+    struct {
+        uint8_t COMSTAT;
+    };
+    struct {
+        CAN_STATUS STATUS;
+    };
+} CAN_RAW_STATUS;
+
+
 CAN_RX* RxRegisters[8] = { (CAN_RX*)&RXB0CON, (CAN_RX*)&RXB1CON, (CAN_RX*)&B0CON, (CAN_RX*)&B1CON, (CAN_RX*)&B2CON, (CAN_RX*)&B3CON, (CAN_RX*)&B4CON, (CAN_RX*)&B5CON };
 uint16_t speed = 0;
 
@@ -52,6 +62,7 @@ uint16_t speed = 0;
 void can_preinit() {
     TRISB2 = 0;
     TRISB3 = 1;
+    CIOCONbits.ENDRHI = 1; //drive Vdd when recessive
 
     CANCON = 0b10000000; //set to Configuration mode
     while ((CANSTAT & 0b11100000) != 0b10000000);
@@ -147,9 +158,15 @@ void can_init_1000k() {
     speed = 1000;
 }
 
-
 uint16_t can_getSpeed() {
     return speed;
+}
+
+
+CAN_STATUS can_getStatus() {
+    CAN_RAW_STATUS status;
+    status.COMSTAT = COMSTAT;
+    return status.STATUS;
 }
 
 

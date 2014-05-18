@@ -8,13 +8,22 @@
 #include "can.h"
 
 
-#define BUFFER_MAX  64
-uint8_t Buffer[BUFFER_MAX];
-uint8_t BufferCount = 0;
+#define UART_BUFFER_MAX  64
+uint8_t UartBuffer[UART_BUFFER_MAX];
+uint8_t UartBufferCount = 0;
+
+#define CAN_BUFFER_MAX  255
+CAN_MESSAGE CanBuffer[CAN_BUFFER_MAX];
+uint8_t CanBufferStart = 0;
+uint8_t CanBufferEnd = 0;
+uint8_t CanBufferCount = 0;
 
 bool Echo = false;
+bool Report = false;
+
 
 void processUart(void);
+void reportNextMessage(void);
 
 
 void main(void) {    
@@ -37,28 +46,19 @@ void main(void) {
 
         processUart();
 
-        CAN_MESSAGE message;
-        if (can_readAsync(&message)) {
-            io_led_active();
+        if (CanBufferCount < CAN_BUFFER_MAX) {
+            if (can_readAsync(&CanBuffer[CanBufferEnd])) {
+                io_led_active();
 
-            if (message.Flags.IsExtended) {
-                uart_writeHexUInt8(message.Header.ID3);
-                uart_writeHexUInt8(message.Header.ID2);
-                uart_writeHexUInt8(message.Header.ID1);
-                uart_writeHexUInt8(message.Header.ID0);
-            } else {
-                uart_writeHexDigit(message.Header.ID1);
-                uart_writeHexUInt8(message.Header.ID0);
-            }
-            if (!message.Flags.RemoteRequest) {
-                uart_writeByte(':');
-                for (uint8_t i = 0; i < message.Flags.Length; i++) {
-                    uart_writeHexUInt8(message.Data[i]);
+                CanBufferEnd++;
+                CanBufferCount++;
+                if (Report) {
+                    reportNextMessage();
+                    uart_writeByte('\n');
                 }
-            }
-            uart_writeByte('\n');
 
-            io_led_inactive();
+                io_led_inactive();
+            }
         }
     }
 }
@@ -71,13 +71,13 @@ void processUart() {
 
         if (Echo) { uart_writeByte(data); }
 
-        if (((data == '\r') || (data == '\n')) && (BufferCount > 0)) {
+        if (((data == '\r') || (data == '\n')) && (UartBufferCount > 0)) {
             io_led_active();
 
-            switch (Buffer[0]) {
+            switch (UartBuffer[0]) {
 
                 case '?': {
-                    if (BufferCount == 1) {
+                    if (UartBufferCount == 1) {
                         uart_writeString("CanStick A");
                     } else {
                         uart_writeString("!n");
@@ -85,7 +85,7 @@ void processUart() {
                 } break;
 
                 case '#': { //Reset
-                    if (BufferCount == 1) {
+                    if (UartBufferCount == 1) {
                         uart_writeByte('\n');
                         Reset();
                     } else {
@@ -125,8 +125,8 @@ void processUart() {
                     uint8_t i = 0;
 
                     //get id
-                    for (; (i <= 8) && (i < BufferCount); i++) { //8 id bytes max + 1 byte extra
-                        uint8_t value = Buffer[i];
+                    for (; (i <= 8) && (i < UartBufferCount); i++) { //8 id bytes max + 1 byte extra
+                        uint8_t value = UartBuffer[i];
                         if (value == ':') { //data follows
                             message.Flags.RemoteRequest = 0;
                             i++;
@@ -159,8 +159,8 @@ void processUart() {
 
                     if (!message.Flags.RemoteRequest) { //read data
                         uint8_t j = 0;
-                        for (; (j <= 16) && (i < BufferCount); i++, j++) { //16 data bytes max + 1 byte extra
-                            uint8_t value = Buffer[i];
+                        for (; (j <= 16) && (i < UartBufferCount); i++, j++) { //16 data bytes max + 1 byte extra
+                            uint8_t value = UartBuffer[i];
                             if (value == '~') { //send only if there is a free slot
                                 tentativeSend = true;
                                 i++;
@@ -190,7 +190,7 @@ void processUart() {
                         }
                     }
 
-                    if (i == BufferCount) { //read whole buffer, send message
+                    if (i == UartBufferCount) { //read whole buffer, send message
                         if (tentativeSend) {
                             can_writeAsync(message);
                         } else {
@@ -202,10 +202,11 @@ void processUart() {
                 } break;
 
                 case 'i': { //Status
-                    if (BufferCount == 1) {
+                    if (UartBufferCount == 1) {
                         uart_writeByte('i');
                         if (io_out_getPower()) { uart_writeByte('W'); } else { uart_writeByte('w'); }
                         if (io_out_getTermination()) { uart_writeByte('P'); } else { uart_writeByte('p'); }
+                        if (Report) { uart_writeByte('T'); } else { uart_writeByte('t'); }
                         if (Echo) { uart_writeByte('O'); } else { uart_writeByte('o'); }
                     } else {
                         uart_writeString("!n");
@@ -213,7 +214,7 @@ void processUart() {
                 } break;
 
                 case 'O': { //Echo ON
-                    if (BufferCount == 1) {
+                    if (UartBufferCount == 1) {
                         Echo = true;
                     } else {
                         uart_writeString("!n");
@@ -221,7 +222,7 @@ void processUart() {
                 } break;
 
                 case 'o': { //Echo OFF
-                    if (BufferCount == 1) {
+                    if (UartBufferCount == 1) {
                         Echo = false;
                     } else {
                         uart_writeString("!n");
@@ -229,7 +230,7 @@ void processUart() {
                 } break;
 
                 case 'P': { //Termination ON
-                    if (BufferCount == 1) {
+                    if (UartBufferCount == 1) {
                         io_out_terminationOn();
                     } else {
                         uart_writeString("!n");
@@ -237,21 +238,29 @@ void processUart() {
                 } break;
 
                 case 'p': { //Termination OFF
-                    if (BufferCount == 1) {
+                    if (UartBufferCount == 1) {
                         io_out_terminationOff();
                     } else {
                         uart_writeString("!n");
                     }
                 } break;
 
+                case 'r': { //read message
+                    if (UartBufferCount == 1) {
+                        reportNextMessage();
+                    } else {
+                        uart_writeString("!n");
+                    }
+                } break;
+
                 case 'S': { //Speed
-                    if ((BufferCount == 2) && (Buffer[1] == '*')) { //auto-baud
+                    if ((UartBufferCount == 2) && (UartBuffer[1] == '*')) { //auto-baud
                         //
-                    } else if (BufferCount > 1) {
+                    } else if (UartBufferCount > 1) {
                         uint16_t number = 0;
                         uint8_t digit;
-                        for (uint8_t i = 1; i < BufferCount; i++) {
-                            digit = Buffer[i] - 0x30;
+                        for (uint8_t i = 1; i < UartBufferCount; i++) {
+                            digit = UartBuffer[i] - 0x30;
                             if (digit < 10) {
                                 number *= 10;
                                 number += digit;
@@ -276,8 +285,24 @@ void processUart() {
                     }
                 } break;
 
+                case 'T': { //Report ON
+                    if (UartBufferCount == 1) {
+                        Report = true;
+                    } else {
+                        uart_writeString("!n");
+                    }
+                } break;
+
+                case 't': { //Report OFF
+                    if (UartBufferCount == 1) {
+                        Report = false;
+                    } else {
+                        uart_writeString("!n");
+                    }
+                } break;
+
                 case 'W': { //V+ ON
-                    if (BufferCount == 1) {
+                    if (UartBufferCount == 1) {
                         io_out_powerOn();
                     } else {
                         uart_writeString("!n");
@@ -285,7 +310,7 @@ void processUart() {
                 } break;
 
                 case 'w': { //V+ OFF
-                    if (BufferCount == 1) {
+                    if (UartBufferCount == 1) {
                         io_out_powerOff();
                     } else {
                         uart_writeString("!n");
@@ -299,16 +324,40 @@ void processUart() {
             }
 
             uart_writeByte('\n');
-            BufferCount = 0;
+            UartBufferCount = 0;
             io_led_inactive();
 
         } else {
-            if (BufferCount < BUFFER_MAX) {
-                Buffer[BufferCount] = data;
-                BufferCount++;
+            if (UartBufferCount < UART_BUFFER_MAX) {
+                UartBuffer[UartBufferCount] = data;
+                UartBufferCount++;
             } else {
-                BufferCount = 255; //overflow
+                UartBufferCount = 255; //overflow
             }
         }
+    }
+}
+
+
+void reportNextMessage() {
+    if (CanBufferCount > 0) {
+        CAN_MESSAGE message = CanBuffer[CanBufferStart];
+        if (message.Flags.IsExtended) {
+            uart_writeHexUInt8(message.Header.ID3);
+            uart_writeHexUInt8(message.Header.ID2);
+            uart_writeHexUInt8(message.Header.ID1);
+            uart_writeHexUInt8(message.Header.ID0);
+        } else {
+            uart_writeHexDigit(message.Header.ID1);
+            uart_writeHexUInt8(message.Header.ID0);
+        }
+        if (!message.Flags.RemoteRequest) {
+            uart_writeByte(':');
+            for (uint8_t i = 0; i < message.Flags.Length; i++) {
+                uart_writeHexUInt8(message.Data[i]);
+            }
+        }
+        CanBufferStart++;
+        CanBufferCount--;
     }
 }
