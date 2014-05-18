@@ -182,7 +182,7 @@ bool can_readAsync(CAN_MESSAGE* message) {
 }
 
 void can_read(CAN_MESSAGE* message) {
-    while(!can_readAsync(message));
+    while (!can_readAsync(message));
 }
 
 
@@ -219,5 +219,5 @@ bool can_writeAsync(CAN_MESSAGE message) {
 }
 
 void can_write(CAN_MESSAGE message) {
-    while(!can_writeAsync(message));
+    while (!can_writeAsync(message));
 }

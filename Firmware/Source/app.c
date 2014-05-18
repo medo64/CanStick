@@ -65,9 +65,9 @@ void main(void) {
 
 
 void processUart() {
-    ClrWdt();
-    while (uart_canRead()) {
-        uint8_t data = uart_readByte();
+    uint8_t data;
+    while (uart_readByteAsync(&data)) {
+        ClrWdt();
 
         if (Echo) { uart_writeByte(data); }
 

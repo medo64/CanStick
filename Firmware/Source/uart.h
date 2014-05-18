@@ -17,8 +17,14 @@ bool uart_canWrite();
 /** Blocking read of a single byte. */
 uint8_t uart_readByte();
 
+/** Tries to read byte. Returns true if successful. */
+bool uart_readByteAsync(uint8_t* value);
+
 /** Blocking write of a single byte. */
 void uart_writeByte(uint8_t value);
+
+/** Tries to write byte. Returns true if successful. */
+bool uart_writeByteAsync(uint8_t value);
 
 /** Blocking write of a multiple bytes. */
 void uart_writeBytes(uint8_t *value, uint8_t count);

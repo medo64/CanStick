@@ -33,26 +33,49 @@ void uart_init(uint32_t desiredBaudRate) { //must be 19200 or less
     resetRx();
 }
 
+
 bool uart_canRead() {
-    return (!RC1IF) ? false : true;
+    return RC1IF ? true : false;
 }
 
 bool uart_canWrite() {
-    return (!TXIF) ? false : true;
+    return TXIF ? true : false;
 }
+
 
 uint8_t uart_readByte() {
     if (FERR1) { resetRx(); } //framing error
     if (OERR1) { resetRx(); } //overrun error
-    while (!RC1IF); //wait until something is received
-    uint8_t data = RCREG1;
-    return data;
+    while (!RC1IF);
+    return RCREG1;
 }
+
+bool uart_readByteAsync(uint8_t* value) {
+    if (FERR1) { resetRx(); } //framing error
+    if (OERR1) { resetRx(); } //overrun error
+    if (RC1IF) {
+        *value = RCREG1;
+        return true;
+    } else {
+        return false;
+    }
+}
+
 
 void uart_writeByte(uint8_t value) {
     while (!TXIF); //wait until buffer is empty
     TXREG1 = value;
 }
+
+bool uart_writeByteAsync(uint8_t value) {
+    if (TXIF) {
+        TXREG1 = value;
+        return true;
+    } else {
+        return false;
+    }
+}
+
 
 void uart_writeBytes(uint8_t *value, uint8_t count) {
     for (uint8_t i = 0; i < count; i++) {
@@ -109,4 +132,3 @@ void uart_writeHexUInt8(uint8_t value) {
     uart_writeHexDigit(value >> 4);
     uart_writeHexDigit(value);
 }
-
