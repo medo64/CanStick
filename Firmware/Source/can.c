@@ -46,38 +46,111 @@ typedef struct {
 
 
 CAN_RX* RxRegisters[8] = { (CAN_RX*)&RXB0CON, (CAN_RX*)&RXB1CON, (CAN_RX*)&B0CON, (CAN_RX*)&B1CON, (CAN_RX*)&B2CON, (CAN_RX*)&B3CON, (CAN_RX*)&B4CON, (CAN_RX*)&B5CON };
+uint16_t speed = 0;
 
 
-void can_init_125k() {
+void can_preinit() {
     TRISB2 = 0;
     TRISB3 = 1;
 
-    //set to Configuration mode
-    CANCON = 0b10000000;
+    CANCON = 0b10000000; //set to Configuration mode
     while ((CANSTAT & 0b11100000) != 0b10000000);
 
     BRGCON2bits.SEG2PHTS =  1; //freely programmable SEG2PH
-
-    BRGCON1bits.BRP      = 15;
-    BRGCON2bits.PRSEG    =  1; //1 Tq
-    BRGCON2bits.SEG1PH   =  6; //3 Tq
-    BRGCON3bits.SEG2PH   =  5; //3 Tq
-    BRGCON1bits.SJW      =  1; //1 Tq
-
     ECANCONbits.MDSEL = 2; //enhanced FIFO mode
 
     for (uint8_t i = 0; i < (sizeof(RxRegisters) / sizeof(RxRegisters[0])); i++) {
         (*RxRegisters[i]).CON.RXM1 = 1; //receive all messages
     }
+}
 
-    //set to Normal mode
-    CANCON = 0b00000000;
+void can_postinit() {
+    CANCON = 0b00000000; //set to Normal mode
     while ((CANSTAT & 0b11100000) != 0b00000000);
 }
 
 
-#define CON_RXFUL  0x80
-#define SIDL_EXID  0x08
+void can_init_20k() {
+    can_preinit();
+    BRGCON1bits.BRP    = 63;
+    BRGCON2bits.PRSEG  = 7; //8 Tq
+    BRGCON2bits.SEG1PH = 7; //8 Tq
+    BRGCON3bits.SEG2PH = 7; //8 Tq
+    BRGCON1bits.SJW    = 3; //4 Tq
+    can_postinit();
+    speed = 20;
+}
+
+void can_init_50k() {
+    can_preinit();
+    BRGCON1bits.BRP    = 39;
+    BRGCON2bits.PRSEG  = 6; //7 Tq
+    BRGCON2bits.SEG1PH = 5; //6 Tq
+    BRGCON3bits.SEG2PH = 1; //2 Tq
+    BRGCON1bits.SJW    = 1; //2 Tq
+    can_postinit();
+    speed = 50;
+}
+
+void can_init_125k() {
+    can_preinit();
+    BRGCON1bits.BRP    = 15;
+    BRGCON2bits.PRSEG  = 6; //7 Tq
+    BRGCON2bits.SEG1PH = 5; //6 Tq
+    BRGCON3bits.SEG2PH = 1; //2 Tq
+    BRGCON1bits.SJW    = 1; //2 Tq
+    can_postinit();
+    speed = 125;
+}
+
+void can_init_250k() {
+    can_preinit();
+    BRGCON1bits.BRP    = 7;
+    BRGCON2bits.PRSEG  = 6; //7 Tq
+    BRGCON2bits.SEG1PH = 5; //6 Tq
+    BRGCON3bits.SEG2PH = 1; //2 Tq
+    BRGCON1bits.SJW    = 1; //2 Tq
+    can_postinit();
+    speed = 250;
+}
+
+void can_init_500k() {
+    can_preinit();
+    BRGCON1bits.BRP    = 3;
+    BRGCON2bits.PRSEG  = 6; //7 Tq
+    BRGCON2bits.SEG1PH = 5; //6 Tq
+    BRGCON3bits.SEG2PH = 1; //2 Tq
+    BRGCON1bits.SJW    = 1; //2 Tq
+    can_postinit();
+    speed = 500;
+}
+
+void can_init_800k() {
+    can_preinit();
+    BRGCON1bits.BRP    = 3;
+    BRGCON2bits.PRSEG  = 3; //4 Tq
+    BRGCON2bits.SEG1PH = 2; //3 Tq
+    BRGCON3bits.SEG2PH = 1; //2 Tq
+    BRGCON1bits.SJW    = 1; //2 Tq
+    can_postinit();
+    speed = 800;
+}
+
+void can_init_1000k() {
+    can_preinit();
+    BRGCON1bits.BRP    = 3;
+    BRGCON2bits.PRSEG  = 2; //3 Tq
+    BRGCON2bits.SEG1PH = 1; //2 Tq
+    BRGCON3bits.SEG2PH = 1; //2 Tq
+    BRGCON1bits.SJW    = 0; //1 Tq
+    can_postinit();
+    speed = 1000;
+}
+
+
+uint16_t can_getSpeed() {
+    return speed;
+}
 
 bool can_read(CAN_MESSAGE* message) {
     CAN_RX* root = RxRegisters[CANCON & 0x0F];
@@ -93,7 +166,7 @@ bool can_read(CAN_MESSAGE* message) {
         if (!(*root).CON.RTRRO) {
             (*message).Flags.RemoteRequest = false;
             (*message).Flags.Length = (*root).DLC.DLC;
-            for (unsigned char i = 0; i < (*message).Flags.Length; i++) {
+            for (uint8_t i = 0; i < (*message).Flags.Length; i++) {
                 (*message).Data[i] = (*root).D[i];
             }
         } else {

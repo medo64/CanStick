@@ -15,13 +15,19 @@ bool uart_canRead();
 bool uart_canWrite();
 
 /** Blocking read of a single byte. */
-unsigned char uart_readByte();
+uint8_t uart_readByte();
 
 /** Blocking write of a single byte. */
-void uart_writeByte(unsigned char value);
+void uart_writeByte(uint8_t value);
 
 /** Blocking writes of a multiple bytes. */
-void uart_writeBytes(unsigned char *value, unsigned char count);
+void uart_writeBytes(uint8_t *value, uint8_t count);
+
+void uart_writeUInt8(uint8_t number);
+void uart_writeUInt16(uint16_t number);
+
+void uart_writeHexDigit(uint8_t number);
+void uart_writeHexUInt8(uint8_t number);
 
 
 #endif

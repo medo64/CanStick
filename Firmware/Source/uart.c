@@ -8,7 +8,7 @@
 void resetRx() {
     CREN1 = 0; //disable continous receive, also clears errors
     CREN1 = 1; //enable continous receive
-    unsigned char dummyRead;
+    uint8_t dummyRead;
     dummyRead = RCREG1;
     dummyRead = RCREG1;
     dummyRead = RCREG1; //read data to clear FIFO
@@ -39,22 +39,62 @@ bool uart_canWrite() {
     return (!TXIF) ? false : true;
 }
 
-unsigned char uart_readByte() {
+uint8_t uart_readByte() {
     if (FERR1) { resetRx(); } //framing error
     if (OERR1) { resetRx(); } //overrun error
-    while (!RC1IF) { } //wait until something is received
-    unsigned char data = RCREG1;
+    while (!RC1IF); //wait until something is received
+    uint8_t data = RCREG1;
     return data;
 }
 
-void uart_writeByte(unsigned char value) {
-    while (!TXIF) { } //wait until buffer is empty
+void uart_writeByte(uint8_t value) {
+    while (!TXIF); //wait until buffer is empty
     TXREG1 = value;
 }
 
-void uart_writeBytes(unsigned char *value, unsigned char count) {
-    for (unsigned char i=0; i<count; i++) {
-        while (!TXIF) { } //wait until buffer is empty
+void uart_writeBytes(uint8_t *value, uint8_t count) {
+    for (uint8_t i = 0; i < count; i++) {
+        while (!TXIF); //wait until buffer is empty
         TXREG1 = value[i];
     }
 }
+
+
+void uart_writeUInt8(uint8_t number) {
+    uint8_t chars[3] = { 0 };
+    uint8_t i = 0;
+    for (; i < sizeof(chars); i++) {
+        chars[i] = 0x30 + (number % 10);
+        number /= 10;
+        if (number == 0) { break; }
+    }
+    for (; i != 255; i--) {
+        if (chars[i] != 0) { uart_writeByte(chars[i]); }
+    }
+}
+
+void uart_writeUInt16(uint16_t number) {
+    uint8_t chars[5] = { 0 };
+    uint8_t i = 0;
+    for (; i < sizeof(chars); i++) {
+        chars[i] = 0x30 + (number % 10);
+        number /= 10;
+        if (number == 0) { break; }
+    }
+    for (; i != 255; i--) {
+        if (chars[i] != 0) { uart_writeByte(chars[i]); }
+    }
+}
+
+
+void uart_writeHexDigit(uint8_t number) {
+    uint8_t data = 0x30 + (number & 0x0F);
+    if (data > 0x39) { data += 7; }
+    uart_writeByte(data);
+}
+
+void uart_writeHexUInt8(uint8_t number) {
+    uart_writeHexDigit(number >> 4);
+    uart_writeHexDigit(number);
+}
+
