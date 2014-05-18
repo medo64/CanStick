@@ -8,6 +8,7 @@ UsbCan                                                     64 x 17 mm ~ 1.69sqin
  4  C 100nF /16V X7R (0805)          C4-C7    399-1170-1-ND
  1  C 4.7uF /16V X5R (0805)          C8       1276-1065-1-ND
  1  C 10uF /16V X5R (0805)           C9       399-8013-1-ND
+ 1  D 1N4148WS (SOD323F)             D1       1N4148WSFSCT-ND
  6  DS LED (0805)                    DS1-DS6  475-1415-1-ND
  1  J MCV 1,5/ 4-G-3,81              J1       277-1223-ND          ED2821-ND
  1  L Ferrite 40Ohm (0805)           L1       445-2201-1-ND
