@@ -13,3 +13,7 @@ Firmware/Source/nbproject/Makefile-genesis.properties
 Hardware/Datasheets/*
 Hardware/Research/*
 Hardware/Releases/*
+
+Software/Binaries/*
+Software/Source/*/bin/*
+Software/Source/*/obj/*
