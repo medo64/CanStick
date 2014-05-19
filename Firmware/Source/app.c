@@ -85,6 +85,7 @@ void processUart() {
                         }
                     } break;
 
+
                     case '#': { //Reset
                         if (UartBufferCount == 1) {
                             uart_writeByte('\n');
@@ -93,6 +94,7 @@ void processUart() {
                             uart_writeString("!n");
                         }
                     } break;
+
 
                     case '0':
                     case '1':
@@ -204,16 +206,18 @@ void processUart() {
                         }
                     } break;
 
-                    case 'i': { //Status
+
+                    case 'i': { //Information
                         if (UartBufferCount == 1) {
-                            if (io_out_getPower()) { uart_writeByte('W'); } else { uart_writeByte('w'); }
-                            if (io_out_getTermination()) { uart_writeByte('P'); } else { uart_writeByte('p'); }
-                            if (Report) { uart_writeByte('T'); } else { uart_writeByte('t'); }
+                            if (io_out_getPower()) { uart_writeByte('P'); } else { uart_writeByte('p'); }
+                            if (io_out_getTermination()) { uart_writeByte('T'); } else { uart_writeByte('t'); }
                             if (Echo) { uart_writeByte('O'); } else { uart_writeByte('o'); }
+                            if (Report) { uart_writeByte('Q'); } else { uart_writeByte('q'); }
                         } else {
                             uart_writeString("!n");
                         }
                     } break;
+
 
                     case 'O': { //Echo ON
                         if (UartBufferCount == 1) {
@@ -231,21 +235,40 @@ void processUart() {
                         }
                     } break;
 
-                    case 'P': { //Termination ON
+
+                    case 'P': { //V+ ON
                         if (UartBufferCount == 1) {
-                            io_out_terminationOn();
+                            io_out_powerOn();
                         } else {
                             uart_writeString("!n");
                         }
                     } break;
 
-                    case 'p': { //Termination OFF
+                    case 'p': { //V+ OFF
                         if (UartBufferCount == 1) {
-                            io_out_terminationOff();
+                            io_out_powerOff();
                         } else {
                             uart_writeString("!n");
                         }
                     } break;
+
+
+                    case 'Q': { //Auto-report ON
+                        if (UartBufferCount == 1) {
+                            Report = true;
+                        } else {
+                            uart_writeString("!n");
+                        }
+                    } break;
+
+                    case 'q': { //Auto report OFF
+                        if (UartBufferCount == 1) {
+                            Report = false;
+                        } else {
+                            uart_writeString("!n");
+                        }
+                    } break;
+
 
                     case 'r': { //read message
                         if (UartBufferCount == 1) {
@@ -254,6 +277,7 @@ void processUart() {
                             uart_writeString("!n");
                         }
                     } break;
+
 
                     case 'S': { //Speed
                         if ((UartBufferCount == 2) && (UartBuffer[1] == '*')) { //auto-baud
@@ -286,19 +310,10 @@ void processUart() {
                         }
                     } break;
 
+
                     case 's': { //CAN status
                         if (UartBufferCount == 1) {
                             CAN_STATUS status = can_getStatus();
-                            if (status.RxOverflow) {
-                                uart_writeByte('O');
-                            } else if (status.RxOverflowWarning) {
-                                uart_writeByte('o');
-                            }
-                            if (status.RxPassive) {
-                                uart_writeByte('R');
-                            } else if (status.RxWarning) {
-                                uart_writeByte('r');
-                            }
                             if (status.TxOff) {
                                 uart_writeByte('X');
                             } else if (status.TxPassive) {
@@ -306,49 +321,44 @@ void processUart() {
                             } else if (status.TxWarning) {
                                 uart_writeByte('t');
                             }
-                        } else if (UartBufferCount == 2) {
-                            switch (UartBuffer[1]) {
-                                case 'r': uart_writeUInt8(RXERRCNT); break;
-                                case 't': uart_writeUInt8(TXERRCNT); break;
-                                default: uart_writeString("!k"); break;
+                            if (status.RxPassive) {
+                                uart_writeByte('R');
+                            } else if (status.RxWarning) {
+                                uart_writeByte('r');
+                            }
+                            if (status.RxOverflow) {
+                                uart_writeByte('O');
+                            } else if (status.RxOverflowWarning) {
+                                uart_writeByte('o');
+                            }
+                            if ((TXERRCNT > 0) || (RXERRCNT > 0)) {
+                                uart_writeByte(':');
+                                uart_writeHexUInt8(TXERRCNT);
+                                uart_writeHexUInt8(RXERRCNT);
                             }
                         } else {
                             uart_writeString("!n");
                         }
                     } break;
 
-                    case 'T': { //Report ON
+
+                    case 'T': { //Termination ON
                         if (UartBufferCount == 1) {
-                            Report = true;
+                            io_out_terminationOn();
                         } else {
                             uart_writeString("!n");
                         }
                     } break;
 
-                    case 't': { //Report OFF
+                    case 't': { //Termination OFF
                         if (UartBufferCount == 1) {
-                            Report = false;
+                            io_out_terminationOff();
                         } else {
                             uart_writeString("!n");
                         }
                     } break;
 
-                    case 'W': { //V+ ON
-                        if (UartBufferCount == 1) {
-                            io_out_powerOn();
-                        } else {
-                            uart_writeString("!n");
-                        }
-                    } break;
-
-                    case 'w': { //V+ OFF
-                        if (UartBufferCount == 1) {
-                            io_out_powerOff();
-                        } else {
-                            uart_writeString("!n");
-                        }
-                    } break;
-
+                    
                     default:
                         uart_writeString("!c");
                         break;
