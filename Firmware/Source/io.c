@@ -1,11 +1,11 @@
 #include <p18cxxx.h>
 
 void io_init() {
-    LA0 = 1; //turn off termination
-    LA1 = 0; //turn on LED
-    LC3 = 1; //turn off V+
+    LC5 = 0; //turn on LED
+    LC4 = 1; //turn off termination
+    LB5 = 1; //turn off V+
 
-    TRISA0 = 0;
-    TRISA1 = 0;
-    TRISC3 = 0;
+    TRISC5 = 0;
+    TRISC4 = 0;
+    TRISB5 = 0;
 }

@@ -61,6 +61,9 @@ void init(void) {
     PLLEN = 1;
     while(!OSCCONbits.OSTS);
     Delay10KTCYx(255);
+    ROON = 1;
+    ROSSLP = 1;
+    ROSEL = 1;
 
     //clear all outputs
     LATA = 0b00000000;

@@ -83,18 +83,18 @@ void can_postinit() {
 
 void can_init_20k() {
     can_preinit();
-    BRGCON1bits.BRP    = 63;
+    BRGCON1bits.BRP    = 59;
     BRGCON2bits.PRSEG  = 7; //8 Tq
     BRGCON2bits.SEG1PH = 7; //8 Tq
-    BRGCON3bits.SEG2PH = 7; //8 Tq
-    BRGCON1bits.SJW    = 3; //4 Tq
+    BRGCON3bits.SEG2PH = 2; //3 Tq
+    BRGCON1bits.SJW    = 2; //3 Tq
     can_postinit();
     speed = 20;
 }
 
 void can_init_50k() {
     can_preinit();
-    BRGCON1bits.BRP    = 39;
+    BRGCON1bits.BRP    = 29;
     BRGCON2bits.PRSEG  = 6; //7 Tq
     BRGCON2bits.SEG1PH = 5; //6 Tq
     BRGCON3bits.SEG2PH = 1; //2 Tq
@@ -105,7 +105,7 @@ void can_init_50k() {
 
 void can_init_125k() {
     can_preinit();
-    BRGCON1bits.BRP    = 15;
+    BRGCON1bits.BRP    = 11;
     BRGCON2bits.PRSEG  = 6; //7 Tq
     BRGCON2bits.SEG1PH = 5; //6 Tq
     BRGCON3bits.SEG2PH = 1; //2 Tq
@@ -116,7 +116,7 @@ void can_init_125k() {
 
 void can_init_250k() {
     can_preinit();
-    BRGCON1bits.BRP    = 7;
+    BRGCON1bits.BRP    = 5;
     BRGCON2bits.PRSEG  = 6; //7 Tq
     BRGCON2bits.SEG1PH = 5; //6 Tq
     BRGCON3bits.SEG2PH = 1; //2 Tq
@@ -127,7 +127,7 @@ void can_init_250k() {
 
 void can_init_500k() {
     can_preinit();
-    BRGCON1bits.BRP    = 3;
+    BRGCON1bits.BRP    = 2;
     BRGCON2bits.PRSEG  = 6; //7 Tq
     BRGCON2bits.SEG1PH = 5; //6 Tq
     BRGCON3bits.SEG2PH = 1; //2 Tq
@@ -138,7 +138,7 @@ void can_init_500k() {
 
 void can_init_800k() {
     can_preinit();
-    BRGCON1bits.BRP    = 3;
+    BRGCON1bits.BRP    = 2;
     BRGCON2bits.PRSEG  = 3; //4 Tq
     BRGCON2bits.SEG1PH = 2; //3 Tq
     BRGCON3bits.SEG2PH = 1; //2 Tq
@@ -149,7 +149,7 @@ void can_init_800k() {
 
 void can_init_1000k() {
     can_preinit();
-    BRGCON1bits.BRP    = 3;
+    BRGCON1bits.BRP    = 2;
     BRGCON2bits.PRSEG  = 2; //3 Tq
     BRGCON2bits.SEG1PH = 1; //2 Tq
     BRGCON3bits.SEG2PH = 1; //2 Tq
