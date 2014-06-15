@@ -61,9 +61,15 @@ void init(void) {
     PLLEN = 1;
     while(!OSCCONbits.OSTS);
     Delay10KTCYx(255);
-    ROON = 1;
-    ROSSLP = 1;
-    ROSEL = 1;
+
+    REFOCONbits.RODIV3 = 0;
+    REFOCONbits.RODIV2 = 0;
+    REFOCONbits.RODIV1 = 0;
+    REFOCONbits.RODIV0 = 0;
+    REFOCONbits.ROSEL = 1;
+    REFOCONbits.ROSSLP = 1;
+    REFOCONbits.ROON = 1;
+    TRISC3 = 0;
 
     //clear all outputs
     LATA = 0b00000000;
