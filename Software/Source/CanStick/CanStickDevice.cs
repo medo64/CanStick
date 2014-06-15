@@ -33,16 +33,16 @@ namespace Medo.Device {
         }
 
 
-        public CanStickInformation GetInformation() {
-            return new CanStickInformation(SendCommand('i'));
+        public CanStickFlags GetInformation() {
+            return new CanStickFlags(SendCommand(':'));
         }
 
         public CanStickStatus GetStatus() {
-            return new CanStickStatus(SendCommand('s'));
+            return new CanStickStatus(SendCommand('?'));
         }
 
         public CanStickMessage GetMessage() {
-            var state = SendCommand('r');
+            var state = SendCommand();
             if (!string.IsNullOrEmpty(state)) {
                 var message = new CanStickMessage(state);
                 if (message.ID >= 0) { return message; }
@@ -52,20 +52,20 @@ namespace Medo.Device {
 
 
         public bool SetPower(bool status) {
-            var state = SendCommand(status ? 'P' : 'p');
+            var state = SendCommand(':', status ? "P" : "p");
             return !state.StartsWith("!", StringComparison.InvariantCulture);
         }
 
         public bool SetTermination(bool status) {
-            var state = SendCommand(status ? 'T' : 't');
+            var state = SendCommand(':', status ? "T" : "t");
             return !state.StartsWith("!", StringComparison.InvariantCulture);
         }
 
 
-        private string SendCommand(char command, params string[] data) {
+        private string SendCommand(char command = '\0', params string[] data) {
             try {
                 var sb = new StringBuilder();
-                sb.Append(command);
+                if (command != '\0') { sb.Append(command); }
                 if (data != null) {
                     foreach (var datum in data) {
                         sb.Append(datum);
@@ -90,9 +90,9 @@ namespace Medo.Device {
     }
 
 
-    public class CanStickInformation {
+    public class CanStickFlags {
 
-        internal CanStickInformation(string line) {
+        internal CanStickFlags(string line) {
             this.IsPowerEnabled = (line.IndexOf("P", StringComparison.Ordinal) >= 0);
             this.IsTerminationEnabled = (line.IndexOf("T", StringComparison.Ordinal) >= 0);
             this.IsEchoEnabled = (line.IndexOf("O", StringComparison.Ordinal) >= 0);

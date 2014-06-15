@@ -135,7 +135,7 @@ namespace CanStick {
         }
 
         private void bwDevice_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e) {
-            var info = e.UserState as CanStickInformation;
+            var info = e.UserState as CanStickFlags;
             var status = e.UserState as CanStickStatus;
             var message = e.UserState as CanStickMessage;
 
@@ -182,10 +182,10 @@ namespace CanStick {
                 }
 
                 var isLast = (lsvMessages.SelectedIndices.Count == 0);
-                lsvMessages.BeginUpdate();
-                lsvMessages.Items.Add(lvi);
-                if (isLast) { lsvMessages.EnsureVisible(lsvMessages.Items.Count - 1); }
-                lsvMessages.EndUpdate();
+                //lsvMessages.BeginUpdate();
+                //lsvMessages.Items.Add(lvi);
+                //if (isLast) { lsvMessages.EnsureVisible(lsvMessages.Items.Count - 1); }
+                //lsvMessages.EndUpdate();
             }
 
             ProcessMenuState();
