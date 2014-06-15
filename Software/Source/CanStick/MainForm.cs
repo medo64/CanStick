@@ -102,9 +102,9 @@ namespace CanStick {
             try {
                 var stopwatch = Stopwatch.StartNew();
                 while (true) {
-                    if (stopwatch.ElapsedMilliseconds > 2500) {
+                    if (stopwatch.ElapsedMilliseconds > 1000) {
                         if (bwDevice.CancellationPending) { break; }
-                        bwDevice.ReportProgress(-1, device.GetInformation());
+                        bwDevice.ReportProgress(-1, device.GetFlags());
 
                         if (bwDevice.CancellationPending) { break; }
                         bwDevice.ReportProgress(-1, device.GetStatus());
@@ -120,8 +120,6 @@ namespace CanStick {
                         Interlocked.Increment(ref this.MessageCount);
                         bwDevice.ReportProgress(-1, message);
                     }
-
-                    Thread.Sleep(1);
                 }
             } catch (Exception ex) {
                 try {
@@ -135,13 +133,13 @@ namespace CanStick {
         }
 
         private void bwDevice_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e) {
-            var info = e.UserState as CanStickFlags;
+            var flags = e.UserState as CanStickFlags;
             var status = e.UserState as CanStickStatus;
             var message = e.UserState as CanStickMessage;
 
-            if (info != null) {
-                staPower.Text = info.IsPowerEnabled ? Strings.PowerOn : Strings.PowerOff;
-                staTermination.Text = info.IsTerminationEnabled ? Strings.TerminationOn : Strings.TerminationOff;
+            if (flags != null) {
+                staPower.Text = flags.IsPowerEnabled ? Strings.PowerOn : Strings.PowerOff;
+                staTermination.Text = flags.IsTerminationEnabled ? Strings.TerminationOn : Strings.TerminationOff;
             } else if (status != null) {
                 if (status.TxOff) {
                     staTxStatus.Text = Strings.TxOff;
@@ -171,7 +169,6 @@ namespace CanStick {
                     staRxOverflowStatus.Text = "";
                 }
             } else if (message != null) {
-                this.MessageCount += 1;
                 var lvi = new ListViewItem(message.IsExtended ? message.ID.ToString("X8") : message.ID.ToString("X3"));
                 if (!message.IsRemoteRequest) {
                     lvi.SubItems.Add(System.BitConverter.ToString(message.GetData()));
@@ -182,10 +179,10 @@ namespace CanStick {
                 }
 
                 var isLast = (lsvMessages.SelectedIndices.Count == 0);
-                //lsvMessages.BeginUpdate();
-                //lsvMessages.Items.Add(lvi);
-                //if (isLast) { lsvMessages.EnsureVisible(lsvMessages.Items.Count - 1); }
-                //lsvMessages.EndUpdate();
+                lsvMessages.BeginUpdate();
+                lsvMessages.Items.Add(lvi);
+                if (isLast) { lsvMessages.EnsureVisible(lsvMessages.Items.Count - 1); }
+                lsvMessages.EndUpdate();
             }
 
             ProcessMenuState();
@@ -278,10 +275,10 @@ namespace CanStick {
             mnxPowerOn.Enabled = false;
             mnxPowerOff.Enabled = false;
             try {
-                var info = (this.Document != null) ? this.Document.GetInformation() : null;
-                if (info != null) {
-                    mnxPowerOn.Enabled = !info.IsPowerEnabled;
-                    mnxPowerOff.Enabled = info.IsPowerEnabled;
+                var flags = (this.Document != null) ? this.Document.GetFlags() : null;
+                if (flags != null) {
+                    mnxPowerOn.Enabled = !flags.IsPowerEnabled;
+                    mnxPowerOff.Enabled = flags.IsPowerEnabled;
                 }
             } catch (Exception) { }
         }
@@ -313,10 +310,10 @@ namespace CanStick {
             mnxTerminationOn.Enabled = false;
             mnxTerminationOff.Enabled = false;
             try {
-                var info = (this.Document != null) ? this.Document.GetInformation() : null;
-                if (info != null) {
-                    mnxTerminationOn.Enabled = !info.IsTerminationEnabled;
-                    mnxTerminationOff.Enabled = info.IsTerminationEnabled;
+                var flags = (this.Document != null) ? this.Document.GetFlags() : null;
+                if (flags != null) {
+                    mnxTerminationOn.Enabled = !flags.IsTerminationEnabled;
+                    mnxTerminationOff.Enabled = flags.IsTerminationEnabled;
                 }
             } catch (Exception) { }
         }

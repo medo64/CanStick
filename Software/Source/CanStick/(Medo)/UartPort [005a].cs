@@ -7,6 +7,7 @@
 //            Port name is not immediately prepended with \\?\.
 //2011-08-04: Compatible with Mono.
 //2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical).
+//2014-06-14: Optimizing Mono check.
 
 
 using System;
@@ -654,12 +655,7 @@ namespace Medo.IO {
         }
 
 
-
-        private static bool IsRunningOnMono {
-            get {
-                return (Type.GetType("Mono.Runtime") != null);
-            }
-        }
+        private readonly bool IsRunningOnMono = (Type.GetType("Mono.Runtime") != null);
 
     }
 }

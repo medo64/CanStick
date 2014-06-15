@@ -72,7 +72,7 @@
     <Compile Include="%28Medo%29\MessageBox [007].cs" />
     <Compile Include="%28Medo%29\Settings [013].cs" />
     <Compile Include="%28Medo%29\State [015].cs" />
-    <Compile Include="%28Medo%29\UartPort [005].cs" />
+    <Compile Include="%28Medo%29\UartPort [005a].cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

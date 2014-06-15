@@ -33,7 +33,7 @@ namespace Medo.Device {
         }
 
 
-        public CanStickFlags GetInformation() {
+        public CanStickFlags GetFlags() {
             return new CanStickFlags(SendCommand(':'));
         }
 
@@ -42,9 +42,9 @@ namespace Medo.Device {
         }
 
         public CanStickMessage GetMessage() {
-            var state = SendCommand();
-            if (!string.IsNullOrEmpty(state)) {
-                var message = new CanStickMessage(state);
+            var line = SendCommand();
+            if (!string.IsNullOrEmpty(line)) {
+                var message = new CanStickMessage(line);
                 if (message.ID >= 0) { return message; }
             }
             return null;

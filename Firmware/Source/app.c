@@ -366,6 +366,7 @@ void processUart() {
                 uart_writeByte('\n');
                 UartBufferCount = 0;
                 io_led_inactive();
+                break;
 
             } else { //read next message
                 reportNextMessage();
