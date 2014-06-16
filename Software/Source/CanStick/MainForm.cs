@@ -102,7 +102,7 @@ namespace CanStick {
             try {
                 var stopwatch = Stopwatch.StartNew();
                 while (true) {
-                    if (stopwatch.ElapsedMilliseconds > 1000) {
+                    if (stopwatch.ElapsedMilliseconds > 500) {
                         if (bwDevice.CancellationPending) { break; }
                         bwDevice.ReportProgress(-1, device.GetFlags());
 
@@ -118,7 +118,9 @@ namespace CanStick {
                         var message = device.GetMessage();
                         if (message == null) { break; }
                         Interlocked.Increment(ref this.MessageCount);
-                        bwDevice.ReportProgress(-1, message);
+                        if (Interlocked.CompareExchange(ref this.ProcessingPaused, 0, 0) == 0) {
+                            bwDevice.ReportProgress(-1, message);
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -234,6 +236,11 @@ namespace CanStick {
                 }
             }
             ProcessMenuState();
+            Interlocked.Exchange(ref this.ProcessingPaused, 0);
+        }
+
+        private void mnuPause_CheckStateChanged(object sender, EventArgs e) {
+            Interlocked.Exchange(ref this.ProcessingPaused, mnuPause.Checked ? 1 : 0);
         }
 
         private void mnuDisconnect_Click(object sender, EventArgs e) {
@@ -247,6 +254,19 @@ namespace CanStick {
                 Medo.MessageBox.ShowError(this, "Cannot disconnect device!\n\n" + ex.Message);
             }
             ProcessMenuState();
+        }
+
+
+        private void mnuListClear_Click(object sender, EventArgs e) {
+            lsvMessages.BeginUpdate();
+            lsvMessages.Items.Clear();
+            lsvMessages.EndUpdate();
+            ProcessMenuState();
+        }
+
+        private void mnuListEnd_Click(object sender, EventArgs e) {
+            lsvMessages.SelectedItems.Clear();
+            lsvMessages.EnsureVisible(lsvMessages.Items.Count - 1);
         }
 
 
@@ -341,6 +361,7 @@ namespace CanStick {
 
         private string LastPorts = "-";
         private int MessageCount = 0;
+        private int ProcessingPaused = 0;
         private DateTime ResetTime = DateTime.UtcNow;
 
         private void tmrRefresh_Tick(object sender, EventArgs e) {
@@ -385,7 +406,11 @@ namespace CanStick {
             mnuCopy.Enabled = (lsvMessages.SelectedItems.Count > 0);
             mnuPorts.Enabled = (this.Document == null);
             mnuConnect.Enabled = (mnuPorts.SelectedItem != null) && (this.Document == null) && (!bwDevice.IsBusy);
+            mnuPause.Enabled = (this.Document != null);
+            if (!mnuPause.Enabled) { mnuPause.Checked = false; }
             mnuDisconnect.Enabled = (this.Document != null);
+            mnuListClear.Enabled = (this.Document != null) || (lsvMessages.Items.Count > 0);
+            mnuListEnd.Enabled = (this.Document != null);
             mnuSend.Enabled = (this.Document != null);
 
             var status = isConnected ? Strings.Connected : Strings.NotConnected;

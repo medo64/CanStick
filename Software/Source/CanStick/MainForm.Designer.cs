@@ -31,8 +31,12 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuPorts = new System.Windows.Forms.ToolStripComboBox();
             this.mnuConnect = new System.Windows.Forms.ToolStripButton();
+            this.mnuPause = new System.Windows.Forms.ToolStripButton();
             this.mnuDisconnect = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.mnuListClear = new System.Windows.Forms.ToolStripButton();
+            this.mnuListEnd = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuSend = new System.Windows.Forms.ToolStripButton();
             this.mnuApp = new System.Windows.Forms.ToolStripDropDownButton();
             this.mnuAppFeedback = new System.Windows.Forms.ToolStripMenuItem();
@@ -40,7 +44,7 @@
             this.mnuAppDonate = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuAppAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.lsvMessages = new System.Windows.Forms.ListView();
+            this.lsvMessages = new CanStick.ListViewEx();
             this.lsvMessages_colID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lsvMessages_colData = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lsvMessages_colFlags = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -51,6 +55,7 @@
             this.staTxStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.staRxStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.staRxOverflowStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.staMessagesPerSecond = new System.Windows.Forms.ToolStripStatusLabel();
             this.tmrRefresh = new System.Windows.Forms.Timer(this.components);
             this.bwDevice = new System.ComponentModel.BackgroundWorker();
             this.mnxPower = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -59,7 +64,6 @@
             this.mnxTermination = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnxTerminationOn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnxTerminationOff = new System.Windows.Forms.ToolStripMenuItem();
-            this.staMessagesPerSecond = new System.Windows.Forms.ToolStripStatusLabel();
             this.mnu.SuspendLayout();
             this.sta.SuspendLayout();
             this.mnxPower.SuspendLayout();
@@ -75,8 +79,12 @@
             this.toolStripSeparator2,
             this.mnuPorts,
             this.mnuConnect,
+            this.mnuPause,
             this.mnuDisconnect,
             this.toolStripSeparator1,
+            this.mnuListClear,
+            this.mnuListEnd,
+            this.toolStripSeparator3,
             this.mnuSend,
             this.mnuApp});
             this.mnu.Location = new System.Drawing.Point(0, 0);
@@ -130,6 +138,18 @@
             this.mnuConnect.ToolTipText = "Connect (F8)";
             this.mnuConnect.Click += new System.EventHandler(this.mnuConnect_Click);
             // 
+            // mnuPause
+            // 
+            this.mnuPause.CheckOnClick = true;
+            this.mnuPause.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.mnuPause.Enabled = false;
+            this.mnuPause.Image = ((System.Drawing.Image)(resources.GetObject("mnuPause.Image")));
+            this.mnuPause.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.mnuPause.Name = "mnuPause";
+            this.mnuPause.Size = new System.Drawing.Size(23, 25);
+            this.mnuPause.Text = "Pause";
+            this.mnuPause.CheckStateChanged += new System.EventHandler(this.mnuPause_CheckStateChanged);
+            // 
             // mnuDisconnect
             // 
             this.mnuDisconnect.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -145,6 +165,33 @@
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 28);
+            // 
+            // mnuListClear
+            // 
+            this.mnuListClear.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.mnuListClear.Enabled = false;
+            this.mnuListClear.Image = ((System.Drawing.Image)(resources.GetObject("mnuListClear.Image")));
+            this.mnuListClear.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.mnuListClear.Name = "mnuListClear";
+            this.mnuListClear.Size = new System.Drawing.Size(23, 25);
+            this.mnuListClear.Text = "Clear list";
+            this.mnuListClear.Click += new System.EventHandler(this.mnuListClear_Click);
+            // 
+            // mnuListEnd
+            // 
+            this.mnuListEnd.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.mnuListEnd.Enabled = false;
+            this.mnuListEnd.Image = ((System.Drawing.Image)(resources.GetObject("mnuListEnd.Image")));
+            this.mnuListEnd.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.mnuListEnd.Name = "mnuListEnd";
+            this.mnuListEnd.Size = new System.Drawing.Size(23, 25);
+            this.mnuListEnd.Text = "Move to end";
+            this.mnuListEnd.Click += new System.EventHandler(this.mnuListEnd_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 28);
             // 
             // mnuSend
             // 
@@ -257,7 +304,7 @@
             // staStatus
             // 
             this.staStatus.Name = "staStatus";
-            this.staStatus.Size = new System.Drawing.Size(318, 20);
+            this.staStatus.Size = new System.Drawing.Size(357, 20);
             this.staStatus.Spring = true;
             this.staStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.staStatus.ToolTipText = "Status";
@@ -298,6 +345,12 @@
             this.staRxOverflowStatus.Size = new System.Drawing.Size(15, 20);
             this.staRxOverflowStatus.Text = "-";
             this.staRxOverflowStatus.ToolTipText = "Receiver overflow status";
+            // 
+            // staMessagesPerSecond
+            // 
+            this.staMessagesPerSecond.Name = "staMessagesPerSecond";
+            this.staMessagesPerSecond.Size = new System.Drawing.Size(15, 20);
+            this.staMessagesPerSecond.Text = "-";
             // 
             // tmrRefresh
             // 
@@ -359,12 +412,6 @@
             this.mnxTerminationOff.Text = "Turn termination off";
             this.mnxTerminationOff.Click += new System.EventHandler(this.mnxTerminationOff_Click);
             // 
-            // staMessagesPerSecond
-            // 
-            this.staMessagesPerSecond.Name = "staMessagesPerSecond";
-            this.staMessagesPerSecond.Size = new System.Drawing.Size(15, 20);
-            this.staMessagesPerSecond.Text = "-";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -399,7 +446,7 @@
         private System.Windows.Forms.ToolStripButton mnuNew;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton mnuCopy;
-        private System.Windows.Forms.ListView lsvMessages;
+        private ListViewEx lsvMessages;
         private System.Windows.Forms.ColumnHeader lsvMessages_colID;
         private System.Windows.Forms.ColumnHeader lsvMessages_colData;
         private System.Windows.Forms.ColumnHeader lsvMessages_colFlags;
@@ -425,6 +472,10 @@
         private System.Windows.Forms.ToolStripMenuItem mnxTerminationOn;
         private System.Windows.Forms.ToolStripMenuItem mnxTerminationOff;
         private System.Windows.Forms.ToolStripStatusLabel staMessagesPerSecond;
+        private System.Windows.Forms.ToolStripButton mnuPause;
+        private System.Windows.Forms.ToolStripButton mnuListClear;
+        private System.Windows.Forms.ToolStripButton mnuListEnd;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
     }
 }
 
