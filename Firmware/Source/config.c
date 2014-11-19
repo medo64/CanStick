@@ -5,11 +5,11 @@
 
 #pragma config RETEN     = OFF
 #pragma config INTOSCSEL = HIGH
-#pragma config SOSCSEL   = HIGH
+#pragma config SOSCSEL   = DIG
 #pragma config XINST     = OFF
 
-#pragma config FOSC      = HS2
-#pragma config PLLCFG    = ON
+#pragma config FOSC      = EC3
+#pragma config PLLCFG    = OFF
 #pragma config FCMEN     = OFF
 #pragma config IESO      = OFF
 
