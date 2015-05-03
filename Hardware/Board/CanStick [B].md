@@ -1,17 +1,16 @@
 ### CanStick ###
 
-64 x 17 mm ~ 1.7sqin
+53.0 x 17.0 mm ~ 1.4 sqin
 
 
 #### Parts ####
 
 |  # | Part                             | RefDes  | Digi-Key Part Number       | Substitute Part Number          |
 |---:|----------------------------------|---------|----------------------------|---------------------------------|
-|  2 | C 22pF /16V NP0 (0805)           | C1 C2   | 1276-1047-1-ND             |                                 |
-|  1 | C 10nF /16V NP0 (0805)           | C3      | 1276-2984-1-ND             |                                 |
-|  4 | C 100nF /16V X7R (0805)          | C4-C7   | 399-1170-1-ND              |                                 |
-|  1 | C 4.7uF /16V X5R (0805)          | C8      | 1276-1065-1-ND             |                                 |
-|  1 | C 10uF /16V X5R (0805)           | C9      | 399-8013-1-ND              |                                 |
+|  3 | C 100nF, X7R (0805)              | C1-C3   | 399-1170-1-ND              |                                 |
+|  1 | C 470nF /16V X7R (0805)          | C4      | 1276-1039-1-ND             |                                 |
+|  1 | C 4.7uF /16V X5R (0805)          | C5      | 1276-1065-1-ND             |                                 |
+|  1 | C 10uF /16V X5R (0805)           | C6      | 399-8013-1-ND              |                                 |
 |  1 | D PMEG3010BEA,115 (SOD323)       | D1      | 568-6511-1-ND              |                                 |
 |  6 | DS LED (0805)                    | DS1-DS6 | 475-1415-1-ND              |                                 |
 |  1 | J MCV 1,5/ 4-G-3,81              | J1      | 277-1223-ND                | ED2821-ND                       |
@@ -21,11 +20,10 @@
 |  4 | R 120 0.125W (0805)              | R1-R4   | RHM120AECT-ND              |                                 |
 |  3 | R 330 0.125W (0805)              | R5-R7   | RMCF0805FT330RCT-ND        |                                 |
 |  3 | R 1K 0.125W (0805)               | R8-R10  | RMCF0805FT1K00CT-ND        |                                 |
-|  2 | R 10K 0.125W (0805)              | R11 R12 | RMCF0805JT10K0CT-ND        |                                 |
-|  1 | U FT232RL (SSOP-28)              | U1      | 768-1007-1-ND              |                                 |
+|  3 | R 10K 0.125W (0805)              | R11-R13 | RMCF0805JT10K0CT-ND        |                                 |
+|  1 | U MCP2221 (TSSOP-14)             | U1      | MCP2221-I/ST               |                                 |
 |  1 | U PIC18F25K80 (SSOP-28)          | U2      | PIC18F25K80-I/SS-ND        |                                 |
 |  1 | U MCP2561 (SOIC-8)               | U3      | MCP2561-E/SN-ND            | 568-10289-1-ND  MCP2562-E/SN-ND |
-|  1 | Y Crystal 12MHz /50ppm /20pF     | Y1      | 887-2011-ND                | 887-1238-ND                     |
 |  1 | P MC 1,5/ 4-ST-3,81              |         | 277-1163-ND                | ED2877-ND                       |
 
-    1/2" heat-shrink tubing, 60mm
+1/2" heat-shrink tubing, 50mm
