@@ -31,6 +31,7 @@ CanStick is a small USB device converting data from CAN bus to serial port.
 | Current state                            | `?`                                     |
 
 
-### Other projects ###
 
-You can check my other projects at [www.jmedved.com](http://www.jmedved.com/).
+---
+
+*You can check my blog and other projects at [www.jmedved.com](http://www.jmedved.com/).*
