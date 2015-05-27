@@ -10,9 +10,9 @@ Firmware/Source/funclist
 Firmware/Source/nbproject/private/**
 Firmware/Source/nbproject/Makefile-genesis.properties
 
-Hardware/Datasheets/**
-Hardware/Research/**
-Hardware/Releases/**
+**/Datasheets/**
+**/Research/**
+**/Releases/**
 
 Software/Binaries/**
 Software/Source/**/bin/*
