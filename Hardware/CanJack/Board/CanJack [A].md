@@ -20,7 +20,7 @@ Panel size: 29.5 x 20.3 mm ~ 1.0 sqin (2x)
 |  1 | L Ferrite 40Ohm (0805)           | L1      | 445-2201-1-ND              |                                 |
 |  3 | R 330 0.125W (0805)              | R1-R3   | RMCF0805FT330RCT-ND        |                                 |
 |  1 | R 1K 0.125W (0805)               | R4      | RMCF0805FT1K00CT-ND        |                                 |
-|  1 | R 3.3K 0.125W (0805)             | R5      | RHM120AECT-ND              |                                 |
+|  1 | R 3.3K 0.125W (0805)             | R5      | RMCF0805FT3K30CT-ND        |                                 |
 |  1 | U FT232RL (SSOP-28)              | U1      | 768-1007-1-ND              |                                 |
 |  1 | U PIC18F25K80 (SSOP-28)          | U2      | PIC18F25K80-I/SS-ND        |                                 |
 |  1 | U MCP2561 (SOIC-8)               | U3      | MCP2561-E/SN-ND            | 568-10289-1-ND  MCP2562-E/SN-ND |
