@@ -5,11 +5,21 @@
 
 #pragma config RETEN     = OFF
 #pragma config INTOSCSEL = HIGH
-#pragma config SOSCSEL   = DIG
+#if defined(DEVICE_CANSTICK)
+    #pragma config SOSCSEL  SOSCSEL = DIG
+#elif defined(DEVICE_CANJACK)
+    #pragma config SOSCSEL   = HIGH
+#endif
 #pragma config XINST     = OFF
 
-#pragma config FOSC      = EC3
-#pragma config PLLCFG    = OFF
+#if defined(DEVICE_CANSTICK)
+    #pragma config FOSC      = EC3
+    #pragma config PLLCFG    = OFF
+#elif defined(DEVICE_CANJACK)
+    #pragma config FOSC      = HS2
+    #pragma config PLLCFG    = ON
+#endif
+
 #pragma config FCMEN     = OFF
 #pragma config IESO      = OFF
 
@@ -52,14 +62,13 @@
 
 #pragma config EBTRB     = OFF
 
-
 void init(void) {
     //disable interrupts
     GIE = 0;
 
     //wait for PLL lock
     PLLEN = 1;
-    while(!OSCCONbits.OSTS);
+    while (!OSCCONbits.OSTS);
     Delay10KTCYx(255);
 
     REFOCONbits.RODIV3 = 0;
@@ -77,11 +86,9 @@ void init(void) {
     LATC = 0b00001000;
 }
 
-
 void wait_short(void) {
     Delay10KTCYx(192);
 }
-
 
 void reset(void) {
     Reset();

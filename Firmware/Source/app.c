@@ -114,6 +114,7 @@ void processUart() {
                                     }
                                 } break;
 
+#if defined(DEVICE_CANSTICK)
                                 case 'P': { //Power on
                                     if (UartBufferCount == 2) {
                                         io_out_powerOn();
@@ -129,6 +130,7 @@ void processUart() {
                                         uart_writeString("!n");
                                     }
                                 } break;
+#endif
 
                                 case 'R': { //Auto-report on
                                     if (UartBufferCount == 2) {
@@ -185,6 +187,7 @@ void processUart() {
                                     }
                                 } break;
 
+#if defined(DEVICE_CANSTICK)
                                 case 'T': { //Termination on
                                     if (UartBufferCount == 2) {
                                         io_out_terminationOn();
@@ -200,6 +203,7 @@ void processUart() {
                                         uart_writeString("!n");
                                     }
                                 } break;
+#endif
 
                                 default: {
                                     uart_writeString("!k");
@@ -207,8 +211,10 @@ void processUart() {
 
                             }
                         } else { //current status
+#if defined(DEVICE_CANSTICK)
                             if (io_out_getPower()) { uart_writeByte('P'); } else { uart_writeByte('p'); }
                             if (io_out_getTermination()) { uart_writeByte('T'); } else { uart_writeByte('t'); }
+#endif
                             if (Echo) { uart_writeByte('E'); } else { uart_writeByte('e'); }
                             if (AutoReport) { uart_writeByte('R'); } else { uart_writeByte('r'); }
                         }
