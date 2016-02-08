@@ -41,6 +41,7 @@ Current: 25 mA
 |  1 | U FT232RL (SSOP-28)              | U1      | 768-1007-1-ND              |
 |  1 | U PIC18F25K80 (SSOP-28)          | U2      | PIC18F25K80-I/SS-ND        |
 |  1 | U MCP2561 (SOIC-8)               | U3      | MCP2561-E/SN-ND / 568-10289-1-ND / MCP2562-E/SN-ND |
+|  1 | U Si8421 (SOIC-8)                | U4      | 336-1755-5-ND              |
 |  1 | VR DC-DC CME0512S3C (SIP-4) *    | VR1     | 811-2892-5-ND              |
 |  1 | VR DC-DC R-78E5.0-0.5 (SIP-3)    | VR2     | 945-1648-5-ND              |
 |  1 | Y Crystal 12MHz 50ppm 20pF       | Y1      | 887-2011-ND / 887-1238-ND  |
