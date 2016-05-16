@@ -1,16 +1,15 @@
-### CanStick ###
+### CanStick/Mini ###
 
 53.0 x 17.0 mm ~ 1.4 sqin
 
 
 #### Parts ####
 
-|  # | Part                             | RefDes  | Digi-Key Part Number       | Substitute Part Number          |
+|  # | Part                             | RefDes  | Digi-Key Part Number       | Alternate Part Number           |
 |---:|----------------------------------|---------|----------------------------|---------------------------------|
 |  3 | C 100nF, X7R (0805)              | C1-C3   | 399-1170-1-ND              |                                 |
 |  1 | C 470nF /16V X7R (0805)          | C4      | 1276-1039-1-ND             |                                 |
-|  1 | C 4.7uF /16V X5R (0805)          | C5      | 1276-1065-1-ND             |                                 |
-|  1 | C 10uF /16V X5R (0805)           | C6      | 399-8013-1-ND              |                                 |
+|  2 | C 10uF /16V X5R (0805)           | C5-C6   | 399-8013-1-ND              |                                 |
 |  1 | D PMEG3010BEA,115 (SOD323)       | D1      | 568-6511-1-ND              |                                 |
 |  6 | DS LED (0805)                    | DS1-DS6 | 475-1415-1-ND              |                                 |
 |  1 | J MCV 1,5/ 4-G-3,81              | J1      | 277-1223-ND                | ED2821-ND                       |
@@ -27,3 +26,7 @@
 |  1 | P MC 1,5/ 4-ST-3,81              |         | 277-1163-ND                | ED2877-ND                       |
 
 1/2" heat-shrink tubing, 50mm
+
+
+WARNING: This is a non-isolated board - beware of ground loops and all the fun
+that can happen with different ground potentials.
