@@ -1,7 +1,6 @@
 #include <pic18f25k80.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <GenericTypeDefs.h>
 
 #include "config.h"
 #include "can.h"

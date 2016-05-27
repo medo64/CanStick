@@ -1,5 +1,5 @@
 #include <p18cxxx.h>
-#include <delays.h>
+#include <stdint.h>
 #include "config.h"
 
 
@@ -61,6 +61,14 @@
 #pragma config EBTR3     = OFF
 
 #pragma config EBTRB     = OFF
+
+
+void Delay10KTCYx(unsigned char count) {
+    do {
+        _delay(10000);
+    } while(--count != 0);
+}
+
 
 void init(void) {
     //disable interrupts

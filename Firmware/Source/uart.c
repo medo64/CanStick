@@ -1,7 +1,6 @@
 #include <pic18f25k80.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <GenericTypeDefs.h>
 
 #include "uart.h"
 #include "config.h"
@@ -20,10 +19,7 @@ void resetRx() {
 
 
 void uart_init(uint32_t desiredBaudRate) { //must be 19200 or less
-    UINT16_VAL spbrg;
-    spbrg.Val = (uint16_t)(_XTAL_FREQ / desiredBaudRate / 4);
-    SPBRG1 = spbrg.v[0];
-    SPBRGH1 = spbrg.v[1];
+    SPBRG = (uint16_t)(_XTAL_FREQ / desiredBaudRate / 4);
     BRG161 = 1; //16-bit
     BRGH1  = 1; //high speed
     SYNC1  = 0; //asynchronous mode
