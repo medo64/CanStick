@@ -21,7 +21,7 @@ Current: 150 mA (max)
 |  1 | D PESD1CAN-UX (SOT23-3)          | D1      | 568-4032-1-ND              |                            |
 |  7 | DS LED (0805)                    | DS1-DS7 | 475-1415-1-ND              |                            |
 |  1 | J USB B, horizontal              | J1      | ED2982-ND                  |                            |
-|  1 | J MC 1,5/ 4-G-3,81               | J2      | 277-1208-ND                |                            |
+|  1 | J MC 1,5/ 4-G-3,81               | J2      | 277-1208-ND                | ED2810-ND                  |
 |  1 | L Ferrite 40Ohm (0805)           | L1      | 445-2201-1-ND              |                            |
 |  2 | R 120 0.5W (1206) †              | R1 R2   | P120ALCT-ND                |                            |
 |  5 | R 330 0.125W (0805)              | R3-R7   | RMCF0805FT330RCT-ND        |                            |
