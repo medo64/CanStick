@@ -30,3 +30,13 @@
 
 WARNING: This is a non-isolated board - beware of ground loops and all the fun
 that can happen with different ground potentials.
+
+
+
+#### Configuration ####
+
+In order to configure CanStick/Mini, one has to use MCP2221 Utility application
+(download from Microchip). In configuration, one MUST change GP1 designation to
+CLK_OUT. Optionally one can setup Descriptor ("CanStick/Mini"), Manufacturer
+("Josip Medved"), and check Enumerate with serial number. Later will allow you
+to have separate COM port number for each of devices.
