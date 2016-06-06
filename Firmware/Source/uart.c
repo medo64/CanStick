@@ -46,7 +46,7 @@ uint8_t uart_readByte() {
     return RCREG1;
 }
 
-bool uart_readByteAsync(uint8_t* value) {
+bool uart_tryReadByte(uint8_t* value) {
     if (FERR1) { resetRx(); } //framing error
     if (OERR1) { resetRx(); } //overrun error
     if (RC1IF) {
@@ -63,7 +63,7 @@ void uart_writeByte(uint8_t value) {
     TXREG1 = value;
 }
 
-bool uart_writeByteAsync(uint8_t value) {
+bool uart_tryWriteByte(uint8_t value) {
     if (TXIF) {
         TXREG1 = value;
         return true;

@@ -56,7 +56,7 @@ typedef union {
 
 CAN_RX* RxRegisters[8] = { (CAN_RX*)&RXB0CON, (CAN_RX*)&RXB1CON, (CAN_RX*)&B0CON, (CAN_RX*)&B1CON, (CAN_RX*)&B2CON, (CAN_RX*)&B3CON, (CAN_RX*)&B4CON, (CAN_RX*)&B5CON };
 uint16_t speed = 0;
-
+CAN_STATE state = CAN_STATE_CLOSED;
 
 void can_preinit() {
     TRISB2 = 0;
@@ -72,93 +72,102 @@ void can_preinit() {
     for (uint8_t i = 0; i < (sizeof(RxRegisters) / sizeof(RxRegisters[0])); i++) {
         (*RxRegisters[i]).CON.RXM1 = 1; //receive all messages
     }
+
+    can_close();
 }
 
-void can_postinit() {
-    CANCON = 0b00000000; //set to Normal mode
-    while ((CANSTAT & 0b11100000) != 0b00000000);
+
+void can_init(uint8_t brp, uint8_t prseg, uint8_t seg1ph, uint8_t seg2ph, uint8_t sjw) {
+    can_preinit();
+    BRGCON1bits.BRP    = brp;
+    BRGCON2bits.PRSEG  = prseg;
+    BRGCON2bits.SEG1PH = seg1ph;
+    BRGCON3bits.SEG2PH = seg2ph;
+    BRGCON1bits.SJW    = sjw;
 }
 
+void can_init_10k() {
+    can_init(149, 5, 5, 1, 1); //PRSEG: 6 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 2 Tq  (16 Tq  0.49%  8000m)
+    speed = 10;
+}
 
 void can_init_20k() {
-    can_preinit();
-    BRGCON1bits.BRP    = 59;
-    BRGCON2bits.PRSEG  = 7; //8 Tq
-    BRGCON2bits.SEG1PH = 7; //8 Tq
-    BRGCON3bits.SEG2PH = 2; //3 Tq
-    BRGCON1bits.SJW    = 2; //3 Tq
-    can_postinit();
+    can_init(74, 5, 5, 1, 1); //PRSEG: 6 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 2 Tq  (16 Tq  0.49%  4000m)
     speed = 20;
 }
 
 void can_init_50k() {
-    can_preinit();
-    BRGCON1bits.BRP    = 29;
-    BRGCON2bits.PRSEG  = 6; //7 Tq
-    BRGCON2bits.SEG1PH = 5; //6 Tq
-    BRGCON3bits.SEG2PH = 1; //2 Tq
-    BRGCON1bits.SJW    = 1; //2 Tq
-    can_postinit();
+    can_init(29, 5, 5, 1, 1); //PRSEG: 6 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 2 Tq  (16 Tq  0.49%  1000m)
     speed = 50;
 }
 
+void can_init_100k() {
+    can_init(14, 5, 5, 1, 1); //PRSEG: 6 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 2 Tq  (16 Tq  0.49%  800m)
+    speed = 100;
+}
+
 void can_init_125k() {
-    can_preinit();
-    BRGCON1bits.BRP    = 11;
-    BRGCON2bits.PRSEG  = 6; //7 Tq
-    BRGCON2bits.SEG1PH = 5; //6 Tq
-    BRGCON3bits.SEG2PH = 1; //2 Tq
-    BRGCON1bits.SJW    = 1; //2 Tq
-    can_postinit();
+    can_init(11, 5, 5, 1, 1); //PRSEG: 6 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 2 Tq  (16 Tq  0.49%  600m)
     speed = 125;
 }
 
 void can_init_250k() {
-    can_preinit();
-    BRGCON1bits.BRP    = 5;
-    BRGCON2bits.PRSEG  = 6; //7 Tq
-    BRGCON2bits.SEG1PH = 5; //6 Tq
-    BRGCON3bits.SEG2PH = 1; //2 Tq
-    BRGCON1bits.SJW    = 1; //2 Tq
-    can_postinit();
+    can_init(5, 5, 5, 1, 1); //PRSEG: 6 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 2 Tq  (16 Tq  0.49%  300m)
     speed = 250;
 }
 
 void can_init_500k() {
-    can_preinit();
-    BRGCON1bits.BRP    = 2;
-    BRGCON2bits.PRSEG  = 6; //7 Tq
-    BRGCON2bits.SEG1PH = 5; //6 Tq
-    BRGCON3bits.SEG2PH = 1; //2 Tq
-    BRGCON1bits.SJW    = 1; //2 Tq
-    can_postinit();
+    can_init(2, 5, 5, 1, 1); //PRSEG: 6 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 2 Tq  (16 Tq  0.49%  100m)
     speed = 500;
 }
 
 void can_init_800k() {
-    can_preinit();
-    BRGCON1bits.BRP    = 2;
-    BRGCON2bits.PRSEG  = 3; //4 Tq
-    BRGCON2bits.SEG1PH = 2; //3 Tq
-    BRGCON3bits.SEG2PH = 1; //2 Tq
-    BRGCON1bits.SJW    = 1; //2 Tq
-    can_postinit();
+    can_init(1, 7, 4, 0, 0); //PRSEG: 8 Tq  SEG1PH: 5 Tq  SEG2PH: 1 Tq  SJW: 1 Tq  (15 Tq  0.26%  80m)
     speed = 800;
 }
 
 void can_init_1000k() {
-    can_preinit();
-    BRGCON1bits.BRP    = 2;
-    BRGCON2bits.PRSEG  = 2; //3 Tq
-    BRGCON2bits.SEG1PH = 1; //2 Tq
-    BRGCON3bits.SEG2PH = 1; //2 Tq
-    BRGCON1bits.SJW    = 0; //1 Tq
-    can_postinit();
+    can_init(1, 5, 3, 0, 0); //PRSEG: 6 Tq  SEG1PH: 4 Tq  SEG2PH: 1 Tq  SJW: 1 Tq  (12 Tq  0.32%  80m)
     speed = 1000;
 }
 
+
 uint16_t can_getSpeed() {
     return speed;
+}
+
+
+void can_open() {
+    CANCON = 0b00000000; //set to normal mode
+    while ((CANSTAT & 0b11100000) != 0b00000000);
+    state = CAN_STATE_OPEN;
+}
+
+void can_openListenOnly() {
+    CANCON = 0b01100000; //set to listen-only mode
+    while ((CANSTAT & 0b11100000) != 0b01100000);
+    state = CAN_STATE_OPEN_LISTENONLY;
+}
+
+void can_openLoopback() {
+    CANCON = 0b01000000; //set to loopback mode
+    while ((CANSTAT & 0b11100000) != 0b01000000);
+    state = CAN_STATE_OPEN_LOOPBACK;
+}
+
+void can_close() {
+    CANCON = 0b00100000; //set to sleep/disabled
+    while ((CANSTAT & 0b11100000) != 0b00100000);
+    state = CAN_STATE_CLOSED;
+}
+
+
+CAN_STATE can_getState() {
+    return state;
+}
+
+bool can_isOpen() {
+    return (state != CAN_STATE_CLOSED) ? true : false;
 }
 
 
@@ -169,7 +178,7 @@ CAN_STATUS can_getStatus() {
 }
 
 
-bool can_readAsync(CAN_MESSAGE* message) {
+bool can_tryRead(CAN_MESSAGE* message) {
     CAN_RX* root = RxRegisters[CANCON & 0x0F];
 
     if ((*root).CON.RXFUL) {
@@ -180,15 +189,14 @@ bool can_readAsync(CAN_MESSAGE* message) {
             (*message).Header.ID = ((*root).SIDH.SID << 3) | (*root).SIDL.SID;
             (*message).Flags.IsExtended = false;
         }
+        (*message).Flags.Length = (*root).DLC.DLC;
         if (!(*root).CON.RTRRO) {
-            (*message).Flags.RemoteRequest = false;
-            (*message).Flags.Length = (*root).DLC.DLC;
+            (*message).Flags.IsRemoteRequest = false;
             for (uint8_t i = 0; i < (*message).Flags.Length; i++) {
                 (*message).Data[i] = (*root).D[i];
             }
         } else {
-            (*message).Flags.RemoteRequest = true;
-            (*message).Flags.Length = 0;
+            (*message).Flags.IsRemoteRequest = true;
         }
         (*root).CON.RXFUL = 0;
         return true;
@@ -198,11 +206,11 @@ bool can_readAsync(CAN_MESSAGE* message) {
 }
 
 void can_read(CAN_MESSAGE* message) {
-    while (!can_readAsync(message));
+    while (!can_tryRead(message));
 }
 
 
-bool can_writeAsync(CAN_MESSAGE message) {
+bool can_tryWrite(CAN_MESSAGE message) {
     if (TXB0CONbits.TXREQ) { return false; }
 
     if (message.Flags.IsExtended) {
@@ -218,7 +226,7 @@ bool can_writeAsync(CAN_MESSAGE message) {
 
     TXB0SIDLbits.EXIDE = message.Flags.IsExtended;
     TXB0DLCbits.DLC = message.Flags.Length;
-    TXB0DLCbits.TXRTR = message.Flags.RemoteRequest;
+    TXB0DLCbits.TXRTR = message.Flags.IsRemoteRequest;
 
     TXB0D0 = message.Data[0];
     TXB0D1 = message.Data[1];
@@ -235,7 +243,7 @@ bool can_writeAsync(CAN_MESSAGE message) {
 }
 
 bool can_write(CAN_MESSAGE message) {
-    while (!can_writeAsync(message)) {
+    while (!can_tryWrite(message)) {
         if (COMSTATbits.TXBO || COMSTATbits.TXBP) { return false; } //break away if device is bus passive
     }
     return true;

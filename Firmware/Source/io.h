@@ -3,9 +3,9 @@
 
 void io_init(void);
 
-#define io_led_active()          LC5 = 1
-#define io_led_inactive()        LC5 = 0
-#define io_led_toggle()          LC5 = !LA1
+#define io_led_on()              LC5 = 0
+#define io_led_off()             LC5 = 1
+#define io_led_toggle()          LC5 = !LC5
 
 #define io_out_terminationOn()   LC4 = 0
 #define io_out_terminationOff()  LC4 = 1
