@@ -25,7 +25,7 @@ Current: 150 mA (max)
 |  1 | L Ferrite 40Ohm (0805)           | L1      | 445-2201-1-ND              |                            |
 |  2 | R 120 0.5W (1206) †              | R1 R2   | P120ALCT-ND                |                            |
 |  5 | R 330 0.125W (0805)              | R3-R7   | RMCF0805FT330RCT-ND        |                            |
-|  4 | R 1K 0.125W (0805)               | R8-R11  | RMCF0805FT1K00CT-ND        |                            |
+|  3 | R 1K 0.125W (0805)               | R8-R10  | RMCF0805FT1K00CT-ND        |                            |
 |  1 | U FT232RL (SSOP-28)              | U1      | 768-1007-1-ND              |                            |
 |  1 | U PIC18F25K80 (SSOP-28)          | U2      | PIC18F25K80-I/SS-ND        |                            |
 |  1 | U ISO1050 (SOP-8)                | U3      | 296-24818-1-ND             |                            |
