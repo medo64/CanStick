@@ -147,6 +147,40 @@ Transmits remote frame with 29-bit ID.
 | Example         | R123456782<CR>                  | <BEL>           | Cannot transmit in read-only (e!)                             |
 
 
+###### Auto-polling <X> ######
+
+Determines if automatic or manual pooling is to be used. Automatic pooling is default.
+
+|                 | Send                            | Receive         | Notes                                                         |
+|-----------------|---------------------------------|-----------------|---------------------------------------------------------------|
+| Syntax          | X{1:state}<CR>                  | <CR> -or- <BEL> |                                                               |
+| Query           | ?X<CR>                          | X{1:state}<CR>  | Returns if automatic polling is enabled (1) or not (0)        |
+| Example         | X0<CR>                          | <CR>            | Disable automatic polling                                     |
+| Example (error) | X<CR>                           | <BEL>           | No state (p!)                                                 |
+
+
+###### Poll one <P> ######
+
+Reports next message waiting in buffer.
+
+|                 | Send                            | Receive         | Notes                                                         |
+|-----------------|---------------------------------|-----------------|---------------------------------------------------------------|
+| Syntax          | P<CR>                           | <CR> -or- <BEL> |                                                               |
+| Example (error) | P0<CR>                          | <BEL>           | Extra data (p!)                                               |
+| Example (error) | P<CR>                           | <BEL>           | Cannot poll in auto-polling mode (e!)                         |
+
+
+###### Poll all <A> ######
+
+Reports all messages waiting in buffer.
+
+|                 | Send                            | Receive         | Notes                                                         |
+|-----------------|---------------------------------|-----------------|---------------------------------------------------------------|
+| Syntax          | A<CR>                           | <CR> -or- <BEL> |                                                               |
+| Example (error) | A0<CR>                          | <BEL>           | Extra data (p!)                                               |
+| Example (error) | A<CR>                           | <BEL>           | Cannot poll in auto-polling mode (e!)                         |
+
+
 ##### Status commands #####
 
 ###### Version <V> ######

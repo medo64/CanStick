@@ -25,7 +25,8 @@ uint8_t CanBufferEnd = 0;
 uint8_t CanBufferCount = 0;
 
 void processUart(void);
-void reportNextMessage(void);
+void reportBufferMessage(void);
+void reportBufferEmpty(void);
 
 
 void main(void) {    
@@ -55,16 +56,32 @@ void main(void) {
             io_led_off();
         }
 
-        while ( (CanBufferCount < CAN_BUFFER_MAX) && (can_tryRead(&CanBuffer[CanBufferEnd])) ) {
+        while ( (CanBufferCount < CAN_BUFFER_MAX) && can_tryRead(&CanBuffer[CanBufferEnd]) ) {
             io_led_off(); ledDelay = 0;
             CanBufferEnd++;
             CanBufferCount++;
         }
-        
-        if (CanBufferCount > 0) {
-            io_led_off(); ledDelay = 0;
-            reportNextMessage();
-            uart_writeByte('\r');
+
+        if (State_AutoPoll) {
+            if (CanBufferCount > 0) {
+                io_led_off(); ledDelay = 0;
+                reportBufferMessage();
+                CanBufferStart++;
+                CanBufferCount--;
+            }
+        } else if (State_ManualPollCount > 0) {
+            if (CanBufferCount > 0) {
+                while ((CanBufferCount > 0) && (State_ManualPollCount > 0)) {
+                    reportBufferMessage();
+                    CanBufferStart++;
+                    CanBufferCount--;
+                    State_ManualPollCount--;
+                }
+                State_ManualPollCount = 0; //stop polling for now
+            } else { //if no messages to poll, just report empty buffer and be done with it
+                reportBufferEmpty();
+                State_ManualPollCount = 0;
+            }
         }
         
         processUart();
@@ -105,50 +122,51 @@ void processUart() {
 }
 
 
-void reportNextMessage() {
-    if (CanBufferCount > 0) {
-        CAN_MESSAGE message = CanBuffer[CanBufferStart];
-        if (State_Cansend) {
-            if (message.Flags.IsExtended) {
-                uart_writeHexUInt8(message.Header.ID3);
-                uart_writeHexUInt8(message.Header.ID2);
-                uart_writeHexUInt8(message.Header.ID1);
-                uart_writeHexUInt8(message.Header.ID0);
-            } else {
-                uart_writeHexDigit(message.Header.ID1);
-                uart_writeHexUInt8(message.Header.ID0);
-            }
-            uart_writeByte('#');
-            if (message.Flags.IsRemoteRequest) {
-                uart_writeByte('R');
-                if (message.Flags.Length > 0) { uart_writeHexDigit(message.Flags.Length); }
-            } else {
-                for (uint8_t i = 0; i < message.Flags.Length; i++) {
-                    uart_writeHexUInt8(message.Data[i]);
-                }
-            }
-        } else { //SLCAN
-            if (message.Flags.IsExtended) {
-                if (message.Flags.IsRemoteRequest) { uart_writeByte('R'); } else { uart_writeByte('T'); }
-                uart_writeHexUInt8(message.Header.ID3);
-                uart_writeHexUInt8(message.Header.ID2);
-                uart_writeHexUInt8(message.Header.ID1);
-                uart_writeHexUInt8(message.Header.ID0);
-            } else {
-                if (message.Flags.IsRemoteRequest) { uart_writeByte('r'); } else { uart_writeByte('t'); }
-                uart_writeHexDigit(message.Header.ID1);
-                uart_writeHexUInt8(message.Header.ID0);
-            }
-            uart_writeHexDigit(message.Flags.Length);
-            if (!message.Flags.IsRemoteRequest) {
-                for (uint8_t i = 0; i < message.Flags.Length; i++) {
-                    uart_writeHexUInt8(message.Data[i]);
-                }
+void reportBufferMessage() {
+    CAN_MESSAGE message = CanBuffer[CanBufferStart];
+    if (State_Cansend) {
+        if (message.Flags.IsExtended) {
+            uart_writeHexUInt8(message.Header.ID3);
+            uart_writeHexUInt8(message.Header.ID2);
+            uart_writeHexUInt8(message.Header.ID1);
+            uart_writeHexUInt8(message.Header.ID0);
+        } else {
+            uart_writeHexDigit(message.Header.ID1);
+            uart_writeHexUInt8(message.Header.ID0);
+        }
+        uart_writeByte('#');
+        if (message.Flags.IsRemoteRequest) {
+            uart_writeByte('R');
+            if (message.Flags.Length > 0) { uart_writeHexDigit(message.Flags.Length); }
+        } else {
+            for (uint8_t i = 0; i < message.Flags.Length; i++) {
+                uart_writeHexUInt8(message.Data[i]);
             }
         }
-        uart_writeByte(CR);
-        if (State_ExtraLf) { uart_writeByte(LF); }
-        CanBufferStart++;
-        CanBufferCount--;
+    } else { //SLCAN
+        if (message.Flags.IsExtended) {
+            if (message.Flags.IsRemoteRequest) { uart_writeByte('R'); } else { uart_writeByte('T'); }
+            uart_writeHexUInt8(message.Header.ID3);
+            uart_writeHexUInt8(message.Header.ID2);
+            uart_writeHexUInt8(message.Header.ID1);
+            uart_writeHexUInt8(message.Header.ID0);
+        } else {
+            if (message.Flags.IsRemoteRequest) { uart_writeByte('r'); } else { uart_writeByte('t'); }
+            uart_writeHexDigit(message.Header.ID1);
+            uart_writeHexUInt8(message.Header.ID0);
+        }
+        uart_writeHexDigit(message.Flags.Length);
+        if (!message.Flags.IsRemoteRequest) {
+            for (uint8_t i = 0; i < message.Flags.Length; i++) {
+                uart_writeHexUInt8(message.Data[i]);
+            }
+        }
     }
+    uart_writeByte(CR);
+    if (State_ExtraLf) { uart_writeByte(LF); }
+}
+
+void reportBufferEmpty() {
+    uart_writeByte(CR);
+    if (State_ExtraLf) { uart_writeByte(LF); }
 }

@@ -110,9 +110,54 @@ bool command_process(uint8_t *buffer, uint8_t count) {
         case 'R': return command_process_send(true, true, &buffer[1], count - 1);
 
         case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
-        case 'A': case 'B': case 'D': case 'E':
+        case 'B': case 'D': case 'E':
         case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
             return command_process_cansend(&buffer[0], count);
+
+        case 'X': { //Auto-polling
+            if (count == 2) {
+                switch (buffer[1]) {
+                    case '0': State_AutoPoll = false; return true;
+                    case '1': State_AutoPoll = true; return true;
+                    default: {
+                        if (State_ExtendedError) { uart_writeString("p!"); }
+                        return false;
+                    }
+                }
+            } else {
+                if (State_ExtendedError) { uart_writeString("p!"); }
+                return false;
+            }
+        }
+
+        case 'P': { //Poll one
+            if (count == 1) {
+                if (State_AutoPoll) {
+                    if (State_ExtendedError) { uart_writeString("e!"); }
+                    return false;
+                } else {
+                    State_ManualPollCount = 1;
+                    return true;
+                }
+            } else {
+                if (State_ExtendedError) { uart_writeString("p!"); }
+                return false;
+            }
+        }
+
+        case 'A': { //Poll all
+            if (count == 1) {
+                if (State_AutoPoll) {
+                    if (State_ExtendedError) { uart_writeString("e!"); }
+                    return false;
+                } else {
+                    State_ManualPollCount = UINT8_MAX;
+                    return true;
+                }
+            } else {
+                return command_process_cansend(&buffer[0], count); //behave as this is ID for sending message
+            }
+        }
 
         
         case 'V': { //Version
@@ -339,6 +384,17 @@ bool command_process_query(uint8_t *buffer, uint8_t count) {
         case 'C': { //Close channel
             if (count == 1) {
                 if (can_getState() == CAN_STATE_CLOSED) { uart_writeString("C1"); } else { uart_writeString("C0"); }
+                return true;
+            } else {
+                if (State_ExtendedError) { uart_writeString("p!"); }
+                return false;
+            }
+        }
+
+
+        case 'X': { //Auto-polling
+            if (count == 1) {
+                if (State_AutoPoll) { uart_writeString("X1"); } else { uart_writeString("X0"); }
                 return true;
             } else {
                 if (State_ExtendedError) { uart_writeString("p!"); }
