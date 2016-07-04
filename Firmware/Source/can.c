@@ -88,47 +88,47 @@ void can_init(uint8_t brp, uint8_t prseg, uint8_t seg1ph, uint8_t seg2ph, uint8_
 }
 
 void can_init_10k() {
-    can_init(149, 6, 5, 1, 0); //PRSEG: 7 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (16 Tq  0.31%  8000m)
+    can_init(199, 4, 3, 1, 0); //PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  8000m)
     speed = 10;
 }
 
 void can_init_20k() {
-    can_init(74, 6, 5, 1, 0); //PRSEG: 7 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (16 Tq  0.31%  4000m)
+    can_init(99, 4, 3, 1, 0); //PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  4000m)
     speed = 20;
 }
 
 void can_init_50k() {
-    can_init(29, 6, 5, 1, 0); //PRSEG: 7 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (16 Tq  0.31%  1000m)
+    can_init(39, 4, 3, 1, 0); //PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  1000m)
     speed = 50;
 }
 
 void can_init_100k() {
-    can_init(14, 6, 5, 1, 0); //PRSEG: 7 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (16 Tq  0.31%  800m)
+    can_init(19, 4, 3, 1, 0); //PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  700m)
     speed = 100;
 }
 
 void can_init_125k() {
-    can_init(11, 6, 5, 1, 0); //PRSEG: 7 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (16 Tq  0.31%  600m)
+    can_init(15, 4, 3, 1, 0); //PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  600m)
     speed = 125;
 }
 
 void can_init_250k() {
-    can_init(5, 6, 5, 1, 0); //PRSEG: 7 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (16 Tq  0.31%  300m)
+    can_init(7, 4, 3, 1, 0); //PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  200m)
     speed = 250;
 }
 
 void can_init_500k() {
-    can_init(2, 6, 5, 1, 0); //PRSEG: 7 Tq  SEG1PH: 6 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (16 Tq  0.31%  100m)
+    can_init(3, 4, 3, 1, 0); //PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  100m)
     speed = 500;
 }
 
 void can_init_800k() {
-    can_init(1, 7, 4, 0, 0); //PRSEG: 8 Tq  SEG1PH: 5 Tq  SEG2PH: 1 Tq  SJW: 1 Tq  (15 Tq  0.26%  80m)
+    can_init(2, 3, 2, 1, 0); //PRSEG: 4 Tq  SEG1PH: 3 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (10 Tq  0.50%  50m)
     speed = 800;
 }
 
 void can_init_1000k() {
-    can_init(0, 7, 7, 6, 0); //PRSEG: 8 Tq  SEG1PH: 8 Tq  SEG2PH: 6 Tq  SJW: 1 Tq  (24 Tq  0.21%  10m)
+    can_init(1, 5, 2, 1, 0); //PRSEG: 6 Tq  SEG1PH: 3 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  50m)
     speed = 1000;
 }
 
