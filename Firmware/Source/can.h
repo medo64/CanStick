@@ -50,10 +50,7 @@ typedef enum CAN_STATE {
 
 
 /** Initializes CAN module. */
-void can_init(uint8_t brp, uint8_t prseg, uint8_t seg1ph, uint8_t seg2ph, uint8_t sjw);
-
-/** Initializes CAN module at 10 kbps. */
-void can_init_10k(void);
+void can_init(uint8_t brp, uint8_t prseg, uint8_t seg1ph, uint8_t seg2ph, uint8_t sjw, bool sampleThree);
 
 /** Initializes CAN module at 20 kbps. */
 void can_init_20k(void);

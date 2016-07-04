@@ -30,7 +30,9 @@ bool command_process(uint8_t *buffer, uint8_t count) {
             }            
             if (count == 2) {
                 switch (buffer[1]) {
-                    case '0':   can_init_10k(); return true;
+                    case '0':
+                        if (State_ExtendedError) { uart_writeString("e!"); }
+                        return false;
                     case '1':   can_init_20k(); return true;
                     case '2':   can_init_50k(); return true;
                     case '3':  can_init_100k(); return true;

@@ -22,20 +22,21 @@ This command will set the speed.
 | Example         | S4`CR`          | `CR`            | Speed is set to 125Kbit/s                                  |
 | Example (error) | Sx`CR`          | `BEL`           | Invalid speed (p!)                                         |
 | Example (error) | S4`CR`          | `BEL`           | Setting speed on open channel (a!)                         |
+| Example (error) | S0`CR`          | `BEL`           | Unsupported speed (e!)                                     |
 
 Following values are allowed (default is 125 Kbit/s):
 
-| Index |          Speed |    BRP |    PRSEG |   SEG1PH |   SEG2PH |      SJW |     Range |
-|------:|---------------:|-------:|---------:|---------:|---------:|---------:|----------:|
-|   0   |    10 Kbit/s   |  199   |   5 TQ   |   4 TQ   |   2 TQ   |   1 TQ   |  8000 m   |
-|   1   |    20 Kbit/s   |   99   |   5 TQ   |   4 TQ   |   2 TQ   |   1 TQ   |  4000 m   |
-|   2   |    50 Kbit/s   |   39   |   5 TQ   |   4 TQ   |   2 TQ   |   1 TQ   |  1000 m   |
-|   3   |   100 Kbit/s   |   19   |   5 TQ   |   4 TQ   |   2 TQ   |   1 TQ   |   700 m   |
-| **4** | **125 Kbit/s** | **15** | **5 TQ** | **4 TQ** | **2 TQ** | **1 TQ** | **600 m** |
-|   5   |   250 Kbit/s   |    7   |   5 TQ   |   4 TQ   |   2 TQ   |   1 TQ   |   200 m   |
-|   6   |   500 Kbit/s   |    3   |   5 TQ   |   4 TQ   |   2 TQ   |   1 TQ   |   100 m   |
-|   7   |   800 Kbit/s   |    2   |   4 TQ   |   3 TQ   |   2 TQ   |   1 TQ   |    50 m   |
-|   8   |  1000 Kbit/s   |    1   |   6 TQ   |   3 TQ   |   2 TQ   |   1 TQ   |    50 m   |
+| Index |           Speed |    BRP |    PRSEG |   SEG1PH |   SEG2PH |      SJW |     Range |
+|------:|----------------:|-------:|---------:|---------:|---------:|---------:|----------:|
+|  *0*  | *Not supported* |  *N/A* |    *N/A* |    *N/A* |    *N/A* |    *N/A* |     *N/A* |
+|   1   |     20 Kbit/s   |   99   |   5 TQ   |   4 TQ   |   2 TQ   |   1 TQ   |  3000 m   |
+|   2   |     50 Kbit/s   |   39   |   5 TQ   |   4 TQ   |   2 TQ   |   1 TQ   |  1000 m   |
+|   3   |    100 Kbit/s   |   19   |   5 TQ   |   4 TQ   |   2 TQ   |   1 TQ   |   700 m   |
+| **4** |  **125 Kbit/s** | **15** | **5 TQ** | **4 TQ** | **2 TQ** | **1 TQ** | **600 m** |
+|   5   |    250 Kbit/s   |    7   |   5 TQ   |   4 TQ   |   2 TQ   |   1 TQ   |   200 m   |
+|   6   |    500 Kbit/s   |    3   |   5 TQ   |   4 TQ   |   2 TQ   |   1 TQ   |   100 m   |
+|   7   |    800 Kbit/s   |    2   |   4 TQ   |   3 TQ   |   2 TQ   |   1 TQ   |    50 m   |
+|   8   |   1000 Kbit/s   |    1   |   6 TQ   |   3 TQ   |   2 TQ   |   1 TQ   |    50 m   |
 
 
 ###### Open channel (O) ######
