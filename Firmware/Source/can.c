@@ -63,7 +63,7 @@ void can_preinit() {
     TRISB3 = 1;
     CIOCONbits.ENDRHI = 1; //drive Vdd when recessive
 
-    CANCON = 0b10000000; //set to Configuration mode
+    CANCONbits.REQOP = 0b100; //set to Configuration mode
     while ((CANSTAT & 0b11100000) != 0b10000000);
 
     BRGCON2bits.SEG2PHTS =  1; //freely programmable SEG2PH
@@ -73,7 +73,7 @@ void can_preinit() {
         (*RxRegisters[i]).CON.RXM1 = 1; //receive all messages
     }
 
-    CANCON = 0b00100000; //set to sleep/disabled
+    CANCONbits.REQOP = 0b001; //set to sleep/disabled
     state = CAN_STATE_CLOSED;
 }
 
@@ -86,6 +86,7 @@ void can_init(uint8_t brp, uint8_t prseg, uint8_t seg1ph, uint8_t seg2ph, uint8_
     BRGCON3bits.SEG2PH = seg2ph;      //SEG2PH
     BRGCON1bits.SJW    = sjw;         //SJW
     BRGCON2bits.SAM    = sampleThree; //SAM
+    speed = 0;
 }
 
 void can_init_20k() {
@@ -135,26 +136,28 @@ uint16_t can_getSpeed() {
 
 
 void can_open() {
-    CANCON = 0b00000000; //set to normal mode
-    while ((CANSTAT & 0b11100000) != 0b00000000);
+    CANCONbits.REQOP = 0b000; //set to normal mode
+    while (CANCONbits.REQOP != 0b000);
     state = CAN_STATE_OPEN;
 }
 
 void can_openListenOnly() {
-    CANCON = 0b01100000; //set to listen-only mode
-    while ((CANSTAT & 0b11100000) != 0b01100000);
+    CANCONbits.REQOP = 0b011; //set to listen-only mode
+    while (CANCONbits.REQOP != 0b011);
     state = CAN_STATE_OPEN_LISTENONLY;
 }
 
 void can_openLoopback() {
-    CANCON = 0b01000000; //set to loopback mode
-    while ((CANSTAT & 0b11100000) != 0b01000000);
+    CANCONbits.REQOP = 0b010; //set to loopback mode
+    while (CANCONbits.REQOP != 0b010);
     state = CAN_STATE_OPEN_LOOPBACK;
 }
 
 void can_close() {
-    CANCON = 0b00100000; //set to sleep/disabled
-    while ((CANSTAT & 0b11100000) != 0b00100000);
+    CANCONbits.REQOP = 0b100; //set to configuration
+    while (CANCONbits.REQOP != 0b100);
+    CANCONbits.REQOP = 0b001; //set to sleep/disabled
+    while (CANCONbits.REQOP != 0b001);
     state = CAN_STATE_CLOSED;
 }
 
