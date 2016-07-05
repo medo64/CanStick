@@ -27,7 +27,7 @@ bool command_process(uint8_t *buffer, uint8_t count) {
             if (can_isOpen()) {
                 if (State_ExtendedError) { uart_writeString("a!"); }
                 return false;
-            }            
+            }
             if (count == 2) {
                 switch (buffer[1]) {
                     case '0':
@@ -45,6 +45,38 @@ bool command_process(uint8_t *buffer, uint8_t count) {
                         if (State_ExtendedError) { uart_writeString("p!"); }
                         return false;
                     }
+                }
+            } else {
+                if (State_ExtendedError) { uart_writeString("p!"); }
+                return false;
+            }
+        }
+
+        case 's': { //Set speed
+            if (can_isOpen()) {
+                if (State_ExtendedError) { uart_writeString("a!"); }
+                return false;
+            }
+            if (count == 5) {
+                uint8_t newBtr0, newBtr1;
+                if (parseHex(buffer[1], &newBtr0) && parseHex(buffer[2], &newBtr0) && parseHex(buffer[3], &newBtr1) && parseHex(buffer[4], &newBtr1)) {
+                    uint8_t newSjw = (newBtr0 >> 6) & 0b11;
+                    uint8_t newBrp = newBtr0 & 0b111111;
+                    bool newSam = (newBtr1 & 0b10000000) == 0b10000000;
+                    uint8_t newSeg2Ph = (newBtr1 >> 4) & 0b111;
+                    uint8_t newSeg1Tq = (newBtr1 & 0b1111) + 1;
+                    if ((newBrp > 0) && (newSeg1Tq >= 2)) {
+                        uint8_t newPrseg  = (newSeg1Tq > 8) ? (newSeg1Tq - 8 - 1) : 0;
+                        uint8_t newSeg1Ph = (newSeg1Tq > 8) ? 7 : (newSeg1Tq - 1 - 1);
+                        can_init(newBrp, newPrseg, newSeg1Ph, newSeg2Ph, newSjw, newSam);
+                        return true;
+                    } else {
+                        if (State_ExtendedError) { uart_writeString("e!"); }
+                        return false;
+                    }
+                } else {
+                    if (State_ExtendedError) { uart_writeString("p!"); }
+                    return false;
                 }
             } else {
                 if (State_ExtendedError) { uart_writeString("p!"); }
@@ -333,7 +365,6 @@ bool command_process_query(uint8_t *buffer, uint8_t count) {
         case 'S': { //Get speed
             if (count == 1) {
                 switch (can_getSpeed()) {
-                    case   10: uart_writeString("S0"); return true;
                     case   20: uart_writeString("S1"); return true;
                     case   50: uart_writeString("S2"); return true;
                     case  100: uart_writeString("S3"); return true;
@@ -347,6 +378,21 @@ bool command_process_query(uint8_t *buffer, uint8_t count) {
                         return false;
                     }
                 }
+            } else {
+                if (State_ExtendedError) { uart_writeString("p!"); }
+                return false;
+            }
+        }
+
+        case 's': { //Get speed
+            if (count == 1) {
+                uint8_t seg1 = (BRGCON2bits.PRSEG + 1) + (BRGCON2bits.SEG1PH + 1) - 1;
+                uint8_t btr0 = (BRGCON1bits.SJW << 6) | BRGCON1bits.BRP;
+                uint8_t btr1 = (BRGCON2bits.SAM << 7) | (BRGCON3bits.SEG2PH << 4) | seg1;
+                uart_writeString("s");
+                uart_writeHexUInt8(btr0);
+                uart_writeHexUInt8(btr1);
+                return true;
             } else {
                 if (State_ExtendedError) { uart_writeString("p!"); }
                 return false;

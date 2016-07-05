@@ -39,6 +39,32 @@ Following values are allowed (default is 125 Kbit/s):
 |   8   |   1000 Kbit/s   |    1   |   6 TQ   |   3 TQ   |   2 TQ   |   1 TQ   |    50 m   |
 
 
+###### Set custom speed (s) ######
+
+This command will set the custom speed by directly manipulating BTR0 and BTR1
+registers. As these registers do not exist natively, their values are mapped to
+Microchip's.
+
+|                 | Send                  | Receive               | Notes                                                                         |
+|-----------------|-----------------------|-----------------------|-------------------------------------------------------------------------------|
+| Syntax          | s{2:btr0}{2:btr1}`CR` | `CR` -or- `BEL`       |                                                                               |
+| Query           | ?s`CR`                | s{2:btr0}{2:btr1}`CR` | If predefined value is not matched, `BEL` is returned (a!)                    |
+| Example         | s0F98`CR`             | `CR`                  | Speed is set to 125Kbit/s (SJW:1TQ; BRP:15; SAM:triple; TSEG2:2TQ; TSEG1:9TQ) |
+| Example (error) | sg`CR`                | `BEL`                 | Invalid number (p!)                                                           |
+| Example (error) | s0F98`CR`             | `BEL`                 | Setting speed on open channel (a!)                                            |
+| Example (error) | s0000`CR`             | `BEL`                 | Unsupported speed (e!)                                                        |
+
+Following bit values are used (combined BTR0 and BTR1):
+
+| Position | Length | Name  | Description                                                                                     |
+|---------:|-------:|-------|-------------------------------------------------------------------------------------------------|
+|        0 |      2 | SJW   | Synchronization Jump Width (0-3; 1-4 TQ); directly copied to BRGCON1.SJW                        |
+|        2 |      6 | BRP   | Baud Rate Prescaler (1-63); directly copied to BRGCON1.BRP                                      |
+|        8 |      1 | SAM   | If 0, one sample is taken; if 1, three samples are taken; directly copied to BRGCON2.SAM        |
+|        9 |      3 | TSEG2 | Time Segment 2 (0-7; 1-8 TQ); directly copied to BRGCON3.SEG2PH                                 |
+|       12 |      4 | TSEG1 | Time Segment 1 (1-15; 2-16 TQ); total amount is shared between BRGCON2.PRSEG and BRGCON2.SEG1PH |
+
+
 ###### Open channel (O) ######
 
 Opening the channel so that CAN bus data can be sent and received.
