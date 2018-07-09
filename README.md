@@ -1,5 +1,9 @@
 ### CanStick ###
 
+**This project has been merged into [Cananka](https://www.medo64.com/cananka).**
+
+**Content is left here for historical purposes and it's not maintained.**
+
 CanStick is a small USB device converting data from CAN bus to serial port.
 
 
@@ -398,4 +402,4 @@ Cansend format:
 
 ---
 
-*You can check my blog and other projects at [www.medo64.com](https://www.medo64.com/)*
+*You can check my blog and other projects at [www.medo64.com](https://www.medo64.com/cananka/usb/)*
